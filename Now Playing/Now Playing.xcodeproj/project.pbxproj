@@ -37,6 +37,7 @@
 /* Begin PBXFileReference section */
 		CA265FF82C49609C00C1B3DB /* Config.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Config.xcconfig; sourceTree = "<group>"; };
 		CA265FF92C4960A600C1B3DB /* Sample.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Sample.xcconfig; sourceTree = "<group>"; };
+		CA265FFA2C497B3800C1B3DB /* Now-Playing-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = "Now-Playing-Info.plist"; sourceTree = SOURCE_ROOT; };
 		CAA270E12AE99C3B007D9E3E /* Now Playing.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Now Playing.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		CAA270E42AE99C3B007D9E3E /* Now_PlayingApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Now_PlayingApp.swift; sourceTree = "<group>"; };
 		CAA270E62AE99C3B007D9E3E /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
@@ -78,8 +79,6 @@
 		CAA270D82AE99C3A007D9E3E = {
 			isa = PBXGroup;
 			children = (
-				CA265FF82C49609C00C1B3DB /* Config.xcconfig */,
-				CA265FF92C4960A600C1B3DB /* Sample.xcconfig */,
 				CAA270E32AE99C3B007D9E3E /* Now Playing */,
 				CAA270F42AE99C3E007D9E3E /* Now PlayingTests */,
 				CAA270FE2AE99C3E007D9E3E /* Now PlayingUITests */,
@@ -100,6 +99,9 @@
 		CAA270E32AE99C3B007D9E3E /* Now Playing */ = {
 			isa = PBXGroup;
 			children = (
+				CA265FF82C49609C00C1B3DB /* Config.xcconfig */,
+				CA265FF92C4960A600C1B3DB /* Sample.xcconfig */,
+				CA265FFA2C497B3800C1B3DB /* Now-Playing-Info.plist */,
 				CAA270E42AE99C3B007D9E3E /* Now_PlayingApp.swift */,
 				CAA270E62AE99C3B007D9E3E /* ContentView.swift */,
 				CAA270E82AE99C3D007D9E3E /* Assets.xcassets */,
@@ -436,6 +438,7 @@
 				DEVELOPMENT_ASSET_PATHS = "\"Now Playing/Preview Content\"";
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "Now-Playing-Info.plist";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -464,6 +467,7 @@
 				DEVELOPMENT_ASSET_PATHS = "\"Now Playing/Preview Content\"";
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "Now-Playing-Info.plist";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
