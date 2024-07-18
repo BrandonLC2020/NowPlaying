@@ -3,10 +3,11 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 56;
+	objectVersion = 60;
 	objects = {
 
 /* Begin PBXBuildFile section */
+		CA265FF72C495B4900C1B3DB /* SpotifyiOS in Frameworks */ = {isa = PBXBuildFile; productRef = CA265FF62C495B4900C1B3DB /* SpotifyiOS */; };
 		CAA270E52AE99C3B007D9E3E /* Now_PlayingApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = CAA270E42AE99C3B007D9E3E /* Now_PlayingApp.swift */; };
 		CAA270E72AE99C3B007D9E3E /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CAA270E62AE99C3B007D9E3E /* ContentView.swift */; };
 		CAA270E92AE99C3D007D9E3E /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = CAA270E82AE99C3D007D9E3E /* Assets.xcassets */; };
@@ -51,6 +52,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				CA265FF72C495B4900C1B3DB /* SpotifyiOS in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -143,6 +145,9 @@
 			dependencies = (
 			);
 			name = "Now Playing";
+			packageProductDependencies = (
+				CA265FF62C495B4900C1B3DB /* SpotifyiOS */,
+			);
 			productName = "Now Playing";
 			productReference = CAA270E12AE99C3B007D9E3E /* Now Playing.app */;
 			productType = "com.apple.product-type.application";
@@ -215,6 +220,9 @@
 				Base,
 			);
 			mainGroup = CAA270D82AE99C3A007D9E3E;
+			packageReferences = (
+				CA265FF52C495B4900C1B3DB /* XCLocalSwiftPackageReference "Packages/ios-sdk-2.1.4" */,
+			);
 			productRefGroup = CAA270E22AE99C3B007D9E3E /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
@@ -582,6 +590,20 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCLocalSwiftPackageReference section */
+		CA265FF52C495B4900C1B3DB /* XCLocalSwiftPackageReference "Packages/ios-sdk-2.1.4" */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = "Packages/ios-sdk-2.1.4";
+		};
+/* End XCLocalSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		CA265FF62C495B4900C1B3DB /* SpotifyiOS */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = SpotifyiOS;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = CAA270D92AE99C3A007D9E3E /* Project object */;
 }
