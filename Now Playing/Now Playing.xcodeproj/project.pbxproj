@@ -3,11 +3,12 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 60;
+	objectVersion = 56;
 	objects = {
 
 /* Begin PBXBuildFile section */
 		CA265FF72C495B4900C1B3DB /* SpotifyiOS in Frameworks */ = {isa = PBXBuildFile; productRef = CA265FF62C495B4900C1B3DB /* SpotifyiOS */; };
+		CA265FFF2C4AD73500C1B3DB /* SpotifyController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CA265FFE2C4AD73500C1B3DB /* SpotifyController.swift */; };
 		CAA270E52AE99C3B007D9E3E /* Now_PlayingApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = CAA270E42AE99C3B007D9E3E /* Now_PlayingApp.swift */; };
 		CAA270E72AE99C3B007D9E3E /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CAA270E62AE99C3B007D9E3E /* ContentView.swift */; };
 		CAA270E92AE99C3D007D9E3E /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = CAA270E82AE99C3D007D9E3E /* Assets.xcassets */; };
@@ -38,7 +39,7 @@
 		CA265FF82C49609C00C1B3DB /* Config.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Config.xcconfig; sourceTree = "<group>"; };
 		CA265FF92C4960A600C1B3DB /* Sample.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Sample.xcconfig; sourceTree = "<group>"; };
 		CA265FFA2C497B3800C1B3DB /* Now-Playing-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = "Now-Playing-Info.plist"; sourceTree = SOURCE_ROOT; };
-		CA265FFC2C4A5F2000C1B3DB /* NowPlaying-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "NowPlaying-Bridging-Header.h"; sourceTree = "<group>"; };
+		CA265FFE2C4AD73500C1B3DB /* SpotifyController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpotifyController.swift; sourceTree = "<group>"; };
 		CAA270E12AE99C3B007D9E3E /* Now Playing.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Now Playing.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		CAA270E42AE99C3B007D9E3E /* Now_PlayingApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Now_PlayingApp.swift; sourceTree = "<group>"; };
 		CAA270E62AE99C3B007D9E3E /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
@@ -80,7 +81,6 @@
 		CAA270D82AE99C3A007D9E3E = {
 			isa = PBXGroup;
 			children = (
-				CA265FFC2C4A5F2000C1B3DB /* NowPlaying-Bridging-Header.h */,
 				CAA270E32AE99C3B007D9E3E /* Now Playing */,
 				CAA270F42AE99C3E007D9E3E /* Now PlayingTests */,
 				CAA270FE2AE99C3E007D9E3E /* Now PlayingUITests */,
@@ -105,6 +105,7 @@
 				CA265FF92C4960A600C1B3DB /* Sample.xcconfig */,
 				CA265FFA2C497B3800C1B3DB /* Now-Playing-Info.plist */,
 				CAA270E42AE99C3B007D9E3E /* Now_PlayingApp.swift */,
+				CA265FFE2C4AD73500C1B3DB /* SpotifyController.swift */,
 				CAA270E62AE99C3B007D9E3E /* ContentView.swift */,
 				CAA270E82AE99C3D007D9E3E /* Assets.xcassets */,
 				CAA270EA2AE99C3D007D9E3E /* Preview Content */,
@@ -229,7 +230,7 @@
 			);
 			mainGroup = CAA270D82AE99C3A007D9E3E;
 			packageReferences = (
-				CA265FF52C495B4900C1B3DB /* XCLocalSwiftPackageReference "Packages/ios-sdk-2.1.4" */,
+				CA265FFD2C4AD50A00C1B3DB /* XCRemoteSwiftPackageReference "ios-sdk" */,
 			);
 			productRefGroup = CAA270E22AE99C3B007D9E3E /* Products */;
 			projectDirPath = "";
@@ -274,6 +275,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				CAA270E72AE99C3B007D9E3E /* ContentView.swift in Sources */,
+				CA265FFF2C4AD73500C1B3DB /* SpotifyController.swift in Sources */,
 				CAA270E52AE99C3B007D9E3E /* Now_PlayingApp.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -451,11 +453,11 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				OTHER_LDFLAGS = "-ObjC";
+				OTHER_LDFLAGS = "";
 				PRODUCT_BUNDLE_IDENTIFIER = "memo.com.Now-Playing";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
-				SWIFT_OBJC_BRIDGING_HEADER = "NowPlaying-Bridging-Header.h";
+				SWIFT_OBJC_BRIDGING_HEADER = "";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
@@ -482,11 +484,11 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				OTHER_LDFLAGS = "-ObjC";
+				OTHER_LDFLAGS = "";
 				PRODUCT_BUNDLE_IDENTIFIER = "memo.com.Now-Playing";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
-				SWIFT_OBJC_BRIDGING_HEADER = "NowPlaying-Bridging-Header.h";
+				SWIFT_OBJC_BRIDGING_HEADER = "";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
@@ -605,12 +607,16 @@
 		};
 /* End XCConfigurationList section */
 
-/* Begin XCLocalSwiftPackageReference section */
-		CA265FF52C495B4900C1B3DB /* XCLocalSwiftPackageReference "Packages/ios-sdk-2.1.4" */ = {
-			isa = XCLocalSwiftPackageReference;
-			relativePath = "Packages/ios-sdk-2.1.4";
+/* Begin XCRemoteSwiftPackageReference section */
+		CA265FFD2C4AD50A00C1B3DB /* XCRemoteSwiftPackageReference "ios-sdk" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/spotify/ios-sdk";
+			requirement = {
+				branch = master;
+				kind = branch;
+			};
 		};
-/* End XCLocalSwiftPackageReference section */
+/* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
 		CA265FF62C495B4900C1B3DB /* SpotifyiOS */ = {
