@@ -36,7 +36,6 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
-		CA265FF82C49609C00C1B3DB /* Config.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Config.xcconfig; sourceTree = "<group>"; };
 		CA265FF92C4960A600C1B3DB /* Sample.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Sample.xcconfig; sourceTree = "<group>"; };
 		CA265FFA2C497B3800C1B3DB /* Now-Playing-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = "Now-Playing-Info.plist"; sourceTree = SOURCE_ROOT; };
 		CA265FFE2C4AD73500C1B3DB /* SpotifyController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpotifyController.swift; sourceTree = "<group>"; };
@@ -101,7 +100,6 @@
 		CAA270E32AE99C3B007D9E3E /* Now Playing */ = {
 			isa = PBXGroup;
 			children = (
-				CA265FF82C49609C00C1B3DB /* Config.xcconfig */,
 				CA265FF92C4960A600C1B3DB /* Sample.xcconfig */,
 				CA265FFA2C497B3800C1B3DB /* Now-Playing-Info.plist */,
 				CAA270E42AE99C3B007D9E3E /* Now_PlayingApp.swift */,
