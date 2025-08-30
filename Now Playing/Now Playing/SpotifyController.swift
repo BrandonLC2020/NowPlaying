@@ -11,7 +11,7 @@ import Combine
 
 @MainActor
 final class SpotifyController: NSObject, ObservableObject {
-    let spotifyClientID = "4fd5ff43ca794b528e96cf30eb097819"
+    let spotifyClientID = Bundle.main.object(forInfoDictionaryKey: "SPOTIFY_API_CLIENT_ID") as? String
     let spotifyRedirectURL = URL(string:"spotify-ios-quick-start://spotify-login-callback")!
     
     var accessToken: String?

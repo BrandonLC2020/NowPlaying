@@ -7,6 +7,9 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		71159ED62E63828C006D75D3 /* Config.xcconfig in Resources */ = {isa = PBXBuildFile; fileRef = 71159ED52E63828C006D75D3 /* Config.xcconfig */; };
+		71159ED72E63828C006D75D3 /* Config.xcconfig in Resources */ = {isa = PBXBuildFile; fileRef = 71159ED52E63828C006D75D3 /* Config.xcconfig */; };
+		71159ED82E63828C006D75D3 /* Config.xcconfig in Resources */ = {isa = PBXBuildFile; fileRef = 71159ED52E63828C006D75D3 /* Config.xcconfig */; };
 		CA265FF72C495B4900C1B3DB /* SpotifyiOS in Frameworks */ = {isa = PBXBuildFile; productRef = CA265FF62C495B4900C1B3DB /* SpotifyiOS */; };
 		CA265FFF2C4AD73500C1B3DB /* SpotifyController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CA265FFE2C4AD73500C1B3DB /* SpotifyController.swift */; };
 		CAA270E52AE99C3B007D9E3E /* Now_PlayingApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = CAA270E42AE99C3B007D9E3E /* Now_PlayingApp.swift */; };
@@ -36,6 +39,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		71159ED52E63828C006D75D3 /* Config.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Config.xcconfig; sourceTree = "<group>"; };
 		CA265FF92C4960A600C1B3DB /* Sample.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Sample.xcconfig; sourceTree = "<group>"; };
 		CA265FFA2C497B3800C1B3DB /* Now-Playing-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = "Now-Playing-Info.plist"; sourceTree = SOURCE_ROOT; };
 		CA265FFE2C4AD73500C1B3DB /* SpotifyController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpotifyController.swift; sourceTree = "<group>"; };
@@ -107,6 +111,7 @@
 				CAA270E62AE99C3B007D9E3E /* ContentView.swift */,
 				CAA270E82AE99C3D007D9E3E /* Assets.xcassets */,
 				CAA270EA2AE99C3D007D9E3E /* Preview Content */,
+				71159ED52E63828C006D75D3 /* Config.xcconfig */,
 			);
 			path = "Now Playing";
 			sourceTree = "<group>";
@@ -247,6 +252,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				CAA270EC2AE99C3D007D9E3E /* Preview Assets.xcassets in Resources */,
+				71159ED62E63828C006D75D3 /* Config.xcconfig in Resources */,
 				CAA270E92AE99C3D007D9E3E /* Assets.xcassets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -255,6 +261,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				71159ED72E63828C006D75D3 /* Config.xcconfig in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -262,6 +269,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				71159ED82E63828C006D75D3 /* Config.xcconfig in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
