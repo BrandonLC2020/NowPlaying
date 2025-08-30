@@ -8,12 +8,26 @@
 import SwiftUI
 
 struct ContentView: View {
+    @EnvironmentObject var spotifyController: SpotifyController
+
     var body: some View {
         VStack {
-            Image(systemName: "globe")
-                .imageScale(.large)
-                .foregroundStyle(.tint)
-            Text("Hello, world!")
+            if let trackName = spotifyController.currentTrackName,
+               let trackArtist = spotifyController.currentTrackArtist {
+                if let trackImage = spotifyController.currentTrackImage {
+                    Image(uiImage: trackImage)
+                        .resizable()
+                        .frame(width: 300, height: 300)
+                }
+                Text(trackName)
+                    .font(.title)
+                Text(trackArtist)
+                    .font(.headline)
+            } else {
+                Button("Connect to Spotify") {
+                    spotifyController.authorize()
+                }
+            }
         }
         .padding()
     }
@@ -21,4 +35,5 @@ struct ContentView: View {
 
 #Preview {
     ContentView()
+        .environmentObject(SpotifyController())
 }
