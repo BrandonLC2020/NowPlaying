@@ -31,7 +31,7 @@ final class SpotifyController: NSObject, ObservableObject {
         if let accessToken = parameters?[SPTAppRemoteAccessTokenKey] {
             appRemote.connectionParameters.accessToken = accessToken
             self.accessToken = accessToken
-        } else if let errorDescription = parameters?[SPTAppRemoteErrorDescriptionKey] {
+        } else if (parameters?[SPTAppRemoteErrorDescriptionKey]) != nil {
             // Handle the error
         }
     }
@@ -41,7 +41,7 @@ final class SpotifyController: NSObject, ObservableObject {
     }
     
     lazy var configuration = SPTConfiguration(
-        clientID: spotifyClientID,
+        clientID: spotifyClientID!,
         redirectURL: spotifyRedirectURL
     )
 
