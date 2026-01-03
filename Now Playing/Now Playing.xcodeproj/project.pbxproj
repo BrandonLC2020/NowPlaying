@@ -14,6 +14,9 @@
 		71159EE22E63865B006D75D3 /* SwiftUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 71159EE12E63865B006D75D3 /* SwiftUI.framework */; };
 		71159EF32E63865D006D75D3 /* iOS WidgetExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 71159EDD2E63865B006D75D3 /* iOS WidgetExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		71159F4C2E638E23006D75D3 /* watchOS Watch App.app in Embed Watch Content */ = {isa = PBXBuildFile; fileRef = 71159F2C2E638E22006D75D3 /* watchOS Watch App.app */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		71A64A032F09AE91000C384A /* GlassIcon.icon in Resources */ = {isa = PBXBuildFile; fileRef = 71A64A022F09AE91000C384A /* GlassIcon.icon */; };
+		71A64A042F09AE91000C384A /* GlassIcon.icon in Resources */ = {isa = PBXBuildFile; fileRef = 71A64A022F09AE91000C384A /* GlassIcon.icon */; };
+		71A64A052F09AE91000C384A /* GlassIcon.icon in Resources */ = {isa = PBXBuildFile; fileRef = 71A64A022F09AE91000C384A /* GlassIcon.icon */; };
 		CA265FF72C495B4900C1B3DB /* SpotifyiOS in Frameworks */ = {isa = PBXBuildFile; productRef = CA265FF62C495B4900C1B3DB /* SpotifyiOS */; };
 		CA265FFF2C4AD73500C1B3DB /* SpotifyController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CA265FFE2C4AD73500C1B3DB /* SpotifyController.swift */; };
 		CAA270E52AE99C3B007D9E3E /* Now_PlayingApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = CAA270E42AE99C3B007D9E3E /* Now_PlayingApp.swift */; };
@@ -103,6 +106,7 @@
 		71159F2C2E638E22006D75D3 /* watchOS Watch App.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "watchOS Watch App.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		71159F382E638E23006D75D3 /* watchOS Watch AppTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "watchOS Watch AppTests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		71159F422E638E23006D75D3 /* watchOS Watch AppUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "watchOS Watch AppUITests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
+		71A64A022F09AE91000C384A /* GlassIcon.icon */ = {isa = PBXFileReference; lastKnownFileType = folder.iconcomposer.icon; path = GlassIcon.icon; sourceTree = "<group>"; };
 		CA265FF92C4960A600C1B3DB /* Sample.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Sample.xcconfig; sourceTree = "<group>"; };
 		CA265FFA2C497B3800C1B3DB /* Now-Playing-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = "Now-Playing-Info.plist"; sourceTree = SOURCE_ROOT; };
 		CA265FFE2C4AD73500C1B3DB /* SpotifyController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpotifyController.swift; sourceTree = "<group>"; };
@@ -232,6 +236,7 @@
 		CAA270E32AE99C3B007D9E3E /* Now Playing */ = {
 			isa = PBXGroup;
 			children = (
+				71A64A022F09AE91000C384A /* GlassIcon.icon */,
 				CA265FF92C4960A600C1B3DB /* Sample.xcconfig */,
 				CA265FFA2C497B3800C1B3DB /* Now-Playing-Info.plist */,
 				CAA270E42AE99C3B007D9E3E /* Now_PlayingApp.swift */,
@@ -491,6 +496,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				71A64A042F09AE91000C384A /* GlassIcon.icon in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -498,6 +504,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				71A64A052F09AE91000C384A /* GlassIcon.icon in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -521,6 +528,7 @@
 			files = (
 				CAA270EC2AE99C3D007D9E3E /* Preview Assets.xcassets in Resources */,
 				71159ED62E63828C006D75D3 /* Config.xcconfig in Resources */,
+				71A64A032F09AE91000C384A /* GlassIcon.icon in Resources */,
 				CAA270E92AE99C3D007D9E3E /* Assets.xcassets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -950,8 +958,9 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 71159ED52E63828C006D75D3 /* Config.xcconfig */;
 			buildSettings = {
-				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_APPICON_NAME = GlassIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"Now Playing/Preview Content\"";
@@ -983,8 +992,9 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 71159ED52E63828C006D75D3 /* Config.xcconfig */;
 			buildSettings = {
-				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_APPICON_NAME = GlassIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"Now Playing/Preview Content\"";
