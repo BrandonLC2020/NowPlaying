@@ -23,6 +23,24 @@ struct ContentView: View {
                     .font(.title)
                 Text(trackArtist)
                     .font(.headline)
+                HStack(spacing: 40) {
+                    Button(action: { spotifyController.skipToPrevious() }) {
+                        Image(systemName: "backward.fill")
+                            .font(.largeTitle)
+                    }
+                    Button(action: { spotifyController.play() }) {
+                        Image(systemName: "play.fill")
+                            .font(.largeTitle)
+                    }
+                    Button(action: { spotifyController.pause() }) {
+                        Image(systemName: "pause.fill")
+                            .font(.largeTitle)
+                    }
+                    Button(action: { spotifyController.skipToNext() }) {
+                        Image(systemName: "forward.fill")
+                            .font(.largeTitle)
+                    }
+                }
             } else {
                 Button("Connect to Spotify") {
                     spotifyController.authorize()

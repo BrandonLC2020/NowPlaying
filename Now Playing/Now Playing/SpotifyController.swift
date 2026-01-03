@@ -96,6 +96,38 @@ final class SpotifyController: NSObject, ObservableObject {
             }
         }
     }
+    
+    func skipToPrevious() {
+        appRemote.playerAPI?.skip(toPrevious: { [weak self] result, error in
+            if let error = error {
+                print("Error skipping to previous: \(error.localizedDescription)")
+            }
+        })
+    }
+    
+    func play() {
+        appRemote.playerAPI?.resume({ [weak self] result, error in
+            if let error = error {
+                print("Error playing: \(error.localizedDescription)")
+            }
+        })
+    }
+    
+    func pause() {
+        appRemote.playerAPI?.pause({ [weak self] result, error in
+            if let error = error {
+                print("Error pausing: \(error.localizedDescription)")
+            }
+        })
+    }
+    
+    func skipToNext() {
+        appRemote.playerAPI?.skip(toNext: { [weak self] result, error in
+            if let error = error {
+                print("Error skipping to next: \(error.localizedDescription)")
+            }
+        })
+    }
 }
 
 extension SpotifyController: SPTAppRemoteDelegate {
