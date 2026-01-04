@@ -18,7 +18,7 @@ struct ContentView: View {
                     .scaledToFill()
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
                     .ignoresSafeArea()
-                    .blur(radius: 30)
+                    .blur(radius: 40)
             }
             
             VStack {
