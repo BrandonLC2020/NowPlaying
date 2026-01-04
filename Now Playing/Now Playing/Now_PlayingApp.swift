@@ -13,11 +13,18 @@ struct Now_PlayingApp: App {
 
     var body: some Scene {
         WindowGroup {
-            ContentView()
-                .environmentObject(spotifyController)
-                .onOpenURL { url in
-                    spotifyController.setAccessToken(from: url)
+            // Logic to switch views based on connection/playback state
+            Group {
+                if spotifyController.currentTrackName != nil {
+                    ContentView()
+                } else {
+                    AuthorizationView()
                 }
+            }
+            .environmentObject(spotifyController)
+            .onOpenURL { url in
+                spotifyController.setAccessToken(from: url)
+            }
         }
     }
 }

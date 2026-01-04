@@ -17,6 +17,7 @@
 		71A64A032F09AE91000C384A /* GlassIcon.icon in Resources */ = {isa = PBXBuildFile; fileRef = 71A64A022F09AE91000C384A /* GlassIcon.icon */; };
 		71A64A042F09AE91000C384A /* GlassIcon.icon in Resources */ = {isa = PBXBuildFile; fileRef = 71A64A022F09AE91000C384A /* GlassIcon.icon */; };
 		71A64A052F09AE91000C384A /* GlassIcon.icon in Resources */ = {isa = PBXBuildFile; fileRef = 71A64A022F09AE91000C384A /* GlassIcon.icon */; };
+		71A64ADD2F09FE37000C384A /* AuthorizationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 71A64ADC2F09FE37000C384A /* AuthorizationView.swift */; };
 		CA265FF72C495B4900C1B3DB /* SpotifyiOS in Frameworks */ = {isa = PBXBuildFile; productRef = CA265FF62C495B4900C1B3DB /* SpotifyiOS */; };
 		CA265FFF2C4AD73500C1B3DB /* SpotifyController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CA265FFE2C4AD73500C1B3DB /* SpotifyController.swift */; };
 		CAA270E52AE99C3B007D9E3E /* Now_PlayingApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = CAA270E42AE99C3B007D9E3E /* Now_PlayingApp.swift */; };
@@ -107,6 +108,7 @@
 		71159F382E638E23006D75D3 /* watchOS Watch AppTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "watchOS Watch AppTests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		71159F422E638E23006D75D3 /* watchOS Watch AppUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "watchOS Watch AppUITests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		71A64A022F09AE91000C384A /* GlassIcon.icon */ = {isa = PBXFileReference; lastKnownFileType = folder.iconcomposer.icon; path = GlassIcon.icon; sourceTree = "<group>"; };
+		71A64ADC2F09FE37000C384A /* AuthorizationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthorizationView.swift; sourceTree = "<group>"; };
 		CA265FF92C4960A600C1B3DB /* Sample.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Sample.xcconfig; sourceTree = "<group>"; };
 		CA265FFA2C497B3800C1B3DB /* Now-Playing-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = "Now-Playing-Info.plist"; sourceTree = SOURCE_ROOT; };
 		CA265FFE2C4AD73500C1B3DB /* SpotifyController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpotifyController.swift; sourceTree = "<group>"; };
@@ -236,6 +238,7 @@
 		CAA270E32AE99C3B007D9E3E /* Now Playing */ = {
 			isa = PBXGroup;
 			children = (
+				71A64ADC2F09FE37000C384A /* AuthorizationView.swift */,
 				71A64A022F09AE91000C384A /* GlassIcon.icon */,
 				CA265FF92C4960A600C1B3DB /* Sample.xcconfig */,
 				CA265FFA2C497B3800C1B3DB /* Now-Playing-Info.plist */,
@@ -586,6 +589,7 @@
 			files = (
 				CAA270E72AE99C3B007D9E3E /* ContentView.swift in Sources */,
 				CA265FFF2C4AD73500C1B3DB /* SpotifyController.swift in Sources */,
+				71A64ADD2F09FE37000C384A /* AuthorizationView.swift in Sources */,
 				CAA270E52AE99C3B007D9E3E /* Now_PlayingApp.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

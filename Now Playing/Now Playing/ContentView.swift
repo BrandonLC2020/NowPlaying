@@ -47,9 +47,8 @@ struct ContentView: View {
                         }
                     }
                 } else {
-                    Button("Connect to Spotify") {
-                        spotifyController.authorize()
-                    }
+                    // Fallback or loading state if needed, though App logic handles switching
+                    ProgressView()
                 }
             }
             .padding()
