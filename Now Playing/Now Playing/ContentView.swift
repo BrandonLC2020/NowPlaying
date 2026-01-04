@@ -20,36 +20,33 @@ struct ContentView: View {
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
                     .ignoresSafeArea()
                     .blur(radius: 40)
-                    .overlay(Color.black.opacity(0.3))  // Darkens bg slightly so "liquid" pops
+                    .overlay(Color.black.opacity(0.3))
             }
 
             // MARK: - Foreground Widget Layer
             VStack {
                 if let trackName = spotifyController.currentTrackName,
-                    let trackArtist = spotifyController.currentTrackArtist,
-                    let trackImage = spotifyController.currentTrackImage
+                   let trackArtist = spotifyController.currentTrackArtist,
+                   let trackImage = spotifyController.currentTrackImage
                 {
-
+                    // Album Art
                     Image(uiImage: trackImage)
                         .resizable()
                         .scaledToFill()
                         .frame(maxWidth: 250, maxHeight: 250)
                         .cornerRadius(25)
-                        .shadow(
-                            color: .black.opacity(0.3),
-                            radius: 15,
-                            x: 0,
-                            y: 10
-                        )
+                        .shadow(color: .black.opacity(0.3), radius: 15, x: 0, y: 10)
 
+                    // Track Name
                     Text(trackName)
                         .font(.title)
                         .lineLimit(2)
                         .multilineTextAlignment(.center)
                         .foregroundColor(.white)
                         .frame(width: 250)
-                        .shadow(radius: 2)  // Adds legibility on glass
+                        .shadow(radius: 2)
 
+                    // Artist Name
                     Text(trackArtist)
                         .font(.headline)
                         .lineLimit(1)
@@ -88,6 +85,27 @@ struct ContentView: View {
                     }
                     .padding(.top, 10)
                     .shadow(radius: 2)
+                    
+                    // [NEW] Progress Bar Layer
+                    VStack(spacing: 5) {
+                        ProgressView(
+                            value: Double(spotifyController.currentTrackPosition),
+                            total: Double(spotifyController.currentTrackDuration ?? 1)
+                        )
+                        .tint(.white)
+                        
+                        HStack {
+                            Text(formatTime(spotifyController.currentTrackPosition))
+                            Spacer()
+                            Text(formatTime(spotifyController.currentTrackDuration ?? 0))
+                        }
+                        .font(.caption)
+                        .foregroundColor(.white.opacity(0.8))
+                        .monospacedDigit() // Prevents jitter when numbers change
+                    }
+                    .padding(.horizontal, 20)
+                    .padding(.top, 20)
+                    .frame(maxWidth: 250)
 
                     // Secondary Controls
                     HStack(spacing: 60) {
@@ -103,7 +121,7 @@ struct ContentView: View {
                                 .foregroundColor(.white.opacity(0.9))
                         }
                     }
-                    .padding(.top, 20)
+                    .padding(.top, 5)
                     .shadow(radius: 2)
 
                 } else {
@@ -115,44 +133,42 @@ struct ContentView: View {
             // MARK: - Liquid Glass Modifiers
             .background {
                 ZStack {
-                    // 1. The Blur: Lower opacity = less "frost", more clarity
                     Rectangle()
                         .fill(.ultraThinMaterial)
-                        .opacity(0.25)  // 50% opacity makes it look like clear water, not frosted glass
+                        .opacity(0.25)
 
-                    // 2. The Tint: Adds a tiny bit of white 'substance' so it's not invisible
                     Color.white.opacity(0.10)
                         .blendMode(.overlay)
                 }
             }
-            .environment(\.colorScheme, .dark)  // Keeps text/icons white
+            .environment(\.colorScheme, .dark)
             .cornerRadius(35)
             .overlay(
-                // The "Surface Tension" Border
                 RoundedRectangle(cornerRadius: 35)
                     .stroke(
                         LinearGradient(
                             stops: [
-                                .init(
-                                    color: .white.opacity(0.5),
-                                    location: 0.0
-                                ),  // Top left highlight
-                                .init(
-                                    color: .white.opacity(0.1),
-                                    location: 0.4
-                                ),
+                                .init(color: .white.opacity(0.5), location: 0.0),
+                                .init(color: .white.opacity(0.1), location: 0.4),
                                 .init(color: .clear, location: 0.6),
                             ],
                             startPoint: .topLeading,
                             endPoint: .bottomTrailing
                         ),
-                        lineWidth: 1  // Thinner line for a sharper, wet look
+                        lineWidth: 1
                     )
-                    .blendMode(.overlay)  // Helps the border blend into the background colors
+                    .blendMode(.overlay)
             )
             .shadow(color: .black.opacity(0.2), radius: 20, x: 0, y: 10)
             .padding(20)
         }
+    }
+
+    // [NEW] Helper function to format seconds into mm:ss
+    func formatTime(_ totalSeconds: Int) -> String {
+        let minutes = totalSeconds / 60
+        let seconds = totalSeconds % 60
+        return String(format: "%d:%02d", minutes, seconds)
     }
 }
 
