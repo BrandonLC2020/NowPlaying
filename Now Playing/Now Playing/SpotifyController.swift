@@ -20,6 +20,7 @@ final class SpotifyController: NSObject, ObservableObject {
     @Published var currentTrackArtist: String?
     @Published var currentTrackDuration: Int?
     @Published var currentTrackImage: UIImage?
+    @Published var isPaused: Bool = true
     
     private var connectCancellable: AnyCancellable?
         
@@ -128,6 +129,41 @@ final class SpotifyController: NSObject, ObservableObject {
             }
         })
     }
+    
+    func skipBackward() {
+            appRemote.playerAPI?.getPlayerState { (result, error) in
+                if let error = error {
+                    print("Error getting player state: \(error.localizedDescription)")
+                } else if let playerState = result as? SPTAppRemotePlayerState {
+                    let currentPosition = playerState.playbackPosition
+                    let newPosition = max(0, currentPosition - 15000) // Ensure we don't go below 0
+                    
+                    self.appRemote.playerAPI?.seek(toPosition: newPosition, callback: { (result, error) in
+                        if let error = error {
+                            print("Error seeking backward: \(error.localizedDescription)")
+                        }
+                    })
+                }
+            }
+        }
+
+        func skipForward() {
+            appRemote.playerAPI?.getPlayerState { (result, error) in
+                if let error = error {
+                    print("Error getting player state: \(error.localizedDescription)")
+                } else if let playerState = result as? SPTAppRemotePlayerState {
+                    let currentPosition = playerState.playbackPosition
+                    let newPosition = currentPosition + 15000
+                    // Note: If newPosition > track duration, Spotify usually handles it by skipping to next.
+                    
+                    self.appRemote.playerAPI?.seek(toPosition: newPosition, callback: { (result, error) in
+                        if let error = error {
+                            print("Error seeking forward: \(error.localizedDescription)")
+                        }
+                    })
+                }
+            }
+        }
 }
 
 extension SpotifyController: SPTAppRemoteDelegate {
@@ -157,7 +193,8 @@ extension SpotifyController: SPTAppRemotePlayerStateDelegate {
         self.currentTrackURI = playerState.track.uri
         self.currentTrackName = playerState.track.name
         self.currentTrackArtist = playerState.track.artist.name
-        self.currentTrackDuration = Int(playerState.track.duration) / 1000 // playerState.track.duration is in milliseconds
+        self.currentTrackDuration = Int(playerState.track.duration) / 1000
+        self.isPaused = playerState.isPaused // Add this line
         fetchImage()
     }
 }
