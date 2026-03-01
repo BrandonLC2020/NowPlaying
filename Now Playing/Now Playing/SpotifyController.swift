@@ -33,9 +33,57 @@ final class SpotifyController: NSObject, ObservableObject {
 
     @Published var currentTrackPosition: Int = 0
     @Published var skipInterval: Int = 15
+    @Published var waypoints: [Waypoint] = []
     private var timer: Timer?
 
     private var connectCancellable: AnyCancellable?
+    
+    // Predefined colors for waypoints
+    private let waypointColors = [
+        "#FF5E5E", "#FFBB5C", "#FFD93D", "#6BCB77", "#4D96FF", "#B983FF", "#FF869E", "#54BAB9"
+    ]
+    
+    func addWaypoint() {
+        let position = currentTrackPosition
+        // Prevent duplicate waypoints at same second
+        guard !waypoints.contains(where: { $0.position == position }) else { return }
+        
+        let colorHex = waypointColors[waypoints.count % waypointColors.count]
+        let newWaypoint = Waypoint(position: position, colorHex: colorHex)
+        waypoints.append(newWaypoint)
+        waypoints.sort { $0.position < $1.position }
+        print("Waypoint added: \(newWaypoint.position)s. Total waypoints: \(waypoints.count)")
+        saveWaypoints()
+    }
+    
+    func seekToWaypoint(_ waypoint: Waypoint) {
+        appRemote.playerAPI?.seek(toPosition: waypoint.position * 1000, callback: { (result, error) in
+            if let error = error {
+                print("Error seeking to waypoint: \(error.localizedDescription)")
+            }
+        })
+    }
+    
+    func removeWaypoint(_ waypoint: Waypoint) {
+        waypoints.removeAll { $0.id == waypoint.id }
+        saveWaypoints()
+    }
+    
+    private func saveWaypoints() {
+        guard let trackURI = currentTrackURI else { return }
+        if let encoded = try? JSONEncoder().encode(waypoints) {
+            UserDefaults.standard.set(encoded, forKey: "waypoints_\(trackURI)")
+        }
+    }
+    
+    private func loadWaypoints(for trackURI: String) {
+        if let data = UserDefaults.standard.data(forKey: "waypoints_\(trackURI)"),
+           let decoded = try? JSONDecoder().decode([Waypoint].self, from: data) {
+            self.waypoints = decoded
+        } else {
+            self.waypoints = []
+        }
+    }
 
     private var disconnectCancellable: AnyCancellable?
 
@@ -106,6 +154,7 @@ final class SpotifyController: NSObject, ObservableObject {
         self.currentUserDisplayName = nil
         self.currentUserImage = nil
         self.currentTrackURI = nil
+        self.waypoints = []
         self.appRemote.connectionParameters.accessToken = nil
         stopTimer()
         PlaybackStateManager.shared.clear()
@@ -328,7 +377,13 @@ extension SpotifyController: SPTAppRemoteDelegate {
 
 extension SpotifyController: SPTAppRemotePlayerStateDelegate {
     func playerStateDidChange(_ playerState: SPTAppRemotePlayerState) {
+        let oldURI = self.currentTrackURI
         self.currentTrackURI = playerState.track.uri
+        
+        if oldURI != self.currentTrackURI, let newURI = self.currentTrackURI {
+            loadWaypoints(for: newURI)
+        }
+        
         self.currentTrackName = playerState.track.name
         self.currentTrackArtist = playerState.track.artist.name
         self.currentTrackDuration = Int(playerState.track.duration) / 1000
