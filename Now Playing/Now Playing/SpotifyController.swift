@@ -25,6 +25,8 @@ final class SpotifyController: NSObject, ObservableObject {
     @Published var currentTrackArtist: String?
     @Published var currentTrackDuration: Int?
     @Published var currentTrackImage: UIImage?
+    @Published var currentUserDisplayName: String?
+    @Published var currentUserImage: UIImage?
     @Published var isPaused: Bool = true {
         didSet { saveState() }
     }
@@ -57,6 +59,7 @@ final class SpotifyController: NSObject, ObservableObject {
         if let accessToken = parameters?[SPTAppRemoteAccessTokenKey] {
             appRemote.connectionParameters.accessToken = accessToken
             self.accessToken = accessToken
+            fetchUserProfile()
         } else if (parameters?[SPTAppRemoteErrorDescriptionKey]) != nil {
             // Handle the error
         }
@@ -91,6 +94,60 @@ final class SpotifyController: NSObject, ObservableObject {
         if appRemote.isConnected {
             appRemote.disconnect()
         }
+    }
+
+    func logout() {
+        disconnect()
+        self.accessToken = nil
+        self.currentTrackName = nil
+        self.currentTrackArtist = nil
+        self.currentTrackImage = nil
+        self.currentUserDisplayName = nil
+        self.currentUserImage = nil
+        self.currentTrackURI = nil
+        self.appRemote.connectionParameters.accessToken = nil
+        stopTimer()
+        PlaybackStateManager.shared.clear()
+        saveState()
+    }
+
+    private func fetchUserProfile() {
+        guard let accessToken = self.accessToken else { return }
+
+        var request = URLRequest(url: URL(string: "https://api.spotify.com/v1/me")!)
+        request.setValue("Bearer \(accessToken)", forHTTPHeaderField: "Authorization")
+
+        URLSession.shared.dataTask(with: request) { data, response, error in
+            guard let data = data, error == nil else { return }
+            do {
+                if let json = try JSONSerialization.jsonObject(with: data) as? [String: Any] {
+                   if let displayName = json["display_name"] as? String {
+                        DispatchQueue.main.async {
+                            self.currentUserDisplayName = displayName
+                        }
+                    }
+                    
+                    if let images = json["images"] as? [[String: Any]],
+                       let firstImage = images.first,
+                       let imageUrl = firstImage["url"] as? String {
+                        self.fetchUserImage(from: imageUrl)
+                    }
+                }
+            } catch {
+                print("Error decoding user profile: \(error)")
+            }
+        }.resume()
+    }
+
+    private func fetchUserImage(from urlString: String) {
+        guard let url = URL(string: urlString) else { return }
+        
+        URLSession.shared.dataTask(with: url) { data, response, error in
+            guard let data = data, error == nil, let image = UIImage(data: data) else { return }
+            DispatchQueue.main.async {
+                self.currentUserImage = image
+            }
+        }.resume()
     }
 
     override init() {

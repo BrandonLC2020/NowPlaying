@@ -54,6 +54,20 @@ class PlaybackStateManager {
         }
         return .empty
     }
+
+    func clear() {
+        sharedDefaults?.removeObject(forKey: storageKey)
+        UserDefaults.standard.removeObject(forKey: storageKey)
+
+        let url = FileManager.default.containerURL(forSecurityApplicationGroupIdentifier: suiteName)?
+            .appendingPathComponent("currentTrackImage.jpg")
+
+        let fallbackURL = FileManager.default.urls(for: .cachesDirectory, in: .userDomainMask).first?
+            .appendingPathComponent("currentTrackImage.jpg")
+
+        if let url = url { try? FileManager.default.removeItem(at: url) }
+        if let fallbackURL = fallbackURL { try? FileManager.default.removeItem(at: fallbackURL) }
+    }
     
     func saveImage(_ image: UIImage?) {
         guard let image = image, let data = image.jpegData(compressionQuality: 0.8) else { return }
