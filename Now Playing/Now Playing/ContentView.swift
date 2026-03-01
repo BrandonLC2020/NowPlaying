@@ -90,13 +90,13 @@ struct ContentView: View {
                             if spotifyController.isPaused {
                                 Button(action: { spotifyController.play() }) {
                                     Image(systemName: "play.fill")
-                                        .font(.largeTitle)
+                                        .font(.system(size: 45))
                                         .foregroundColor(.white)
                                 }
                             } else {
                                 Button(action: { spotifyController.pause() }) {
                                     Image(systemName: "pause.fill")
-                                        .font(.largeTitle)
+                                        .font(.system(size: 45))
                                         .foregroundColor(.white)
                                 }
                             }
