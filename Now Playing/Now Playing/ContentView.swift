@@ -19,6 +19,7 @@ struct ContentView: View {
     
     @AppStorage("appTheme") private var appTheme: AppTheme = .album
     @AppStorage("blurRadius") private var blurRadius: Double = 40.0
+    @AppStorage("skipInterval") private var skipInterval: Int = 15
     
     @State private var showingThemeSettings = false
 
@@ -134,13 +135,13 @@ struct ContentView: View {
                         // Secondary Controls
                         HStack(spacing: 60) {
                             Button(action: { spotifyController.skipBackward() }) {
-                                Image(systemName: "gobackward.15")
+                                Image(systemName: "gobackward.\(skipInterval)")
                                     .font(.title)
                                     .foregroundColor(.white.opacity(0.9))
                             }
 
                             Button(action: { spotifyController.skipForward() }) {
-                                Image(systemName: "goforward.15")
+                                Image(systemName: "goforward.\(skipInterval)")
                                     .font(.title)
                                     .foregroundColor(.white.opacity(0.9))
                             }
@@ -187,6 +188,12 @@ struct ContentView: View {
                 .padding(20)
             }
             .navigationBarTitleDisplayMode(.inline)
+            .onAppear {
+                spotifyController.skipInterval = skipInterval
+            }
+            .onChange(of: skipInterval) { newValue in
+                spotifyController.skipInterval = newValue
+            }
             .toolbar {
                 ToolbarItem(placement: .navigationBarLeading) {
                     Button {
@@ -197,15 +204,33 @@ struct ContentView: View {
                     }
                     .popover(isPresented: $showingThemeSettings) {
                         VStack(spacing: 20) {
-                            Text("Theme Settings")
+                            Text("Settings")
                                 .font(.headline)
                             
-                            Picker("Theme", selection: $appTheme) {
-                                ForEach(AppTheme.allCases) { theme in
-                                    Text(theme.rawValue).tag(theme)
+                            VStack(alignment: .leading, spacing: 10) {
+                                Text("Theme")
+                                    .font(.subheadline)
+                                Picker("Theme", selection: $appTheme) {
+                                    ForEach(AppTheme.allCases) { theme in
+                                        Text(theme.rawValue).tag(theme)
+                                    }
                                 }
+                                .pickerStyle(.segmented)
                             }
-                            .pickerStyle(.segmented)
+                            
+                            Divider()
+                            
+                            VStack(alignment: .leading, spacing: 10) {
+                                Text("Skip Interval")
+                                    .font(.subheadline)
+                                Picker("Skip Interval", selection: $skipInterval) {
+                                    Text("5s").tag(5)
+                                    Text("10s").tag(10)
+                                    Text("15s").tag(15)
+                                    Text("30s").tag(30)
+                                }
+                                .pickerStyle(.segmented)
+                            }
                             
                             if appTheme == .album {
                                 Divider()

@@ -32,6 +32,7 @@ final class SpotifyController: NSObject, ObservableObject {
     }
 
     @Published var currentTrackPosition: Int = 0
+    @Published var skipInterval: Int = 15
     private var timer: Timer?
 
     private var connectCancellable: AnyCancellable?
@@ -235,7 +236,7 @@ final class SpotifyController: NSObject, ObservableObject {
                 )
             } else if let playerState = result as? SPTAppRemotePlayerState {
                 let currentPosition = playerState.playbackPosition
-                let newPosition = max(0, currentPosition - 15000)  // Ensure we don't go below 0
+                let newPosition = max(0, currentPosition - (self.skipInterval * 1000))  // Ensure we don't go below 0
 
                 self.appRemote.playerAPI?.seek(
                     toPosition: newPosition,
@@ -259,7 +260,7 @@ final class SpotifyController: NSObject, ObservableObject {
                 )
             } else if let playerState = result as? SPTAppRemotePlayerState {
                 let currentPosition = playerState.playbackPosition
-                let newPosition = currentPosition + 15000
+                let newPosition = currentPosition + (self.skipInterval * 1000)
                 // Note: If newPosition > track duration, Spotify usually handles it by skipping to next.
 
                 self.appRemote.playerAPI?.seek(
