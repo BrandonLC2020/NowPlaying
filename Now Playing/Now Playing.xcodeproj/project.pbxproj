@@ -7,9 +7,6 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		71159ED62E63828C006D75D3 /* Config.xcconfig in Resources */ = {isa = PBXBuildFile; fileRef = 71159ED52E63828C006D75D3 /* Config.xcconfig */; };
-		71159ED72E63828C006D75D3 /* Config.xcconfig in Resources */ = {isa = PBXBuildFile; fileRef = 71159ED52E63828C006D75D3 /* Config.xcconfig */; };
-		71159ED82E63828C006D75D3 /* Config.xcconfig in Resources */ = {isa = PBXBuildFile; fileRef = 71159ED52E63828C006D75D3 /* Config.xcconfig */; };
 		71159EE02E63865B006D75D3 /* WidgetKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 71159EDF2E63865B006D75D3 /* WidgetKit.framework */; };
 		71159EE22E63865B006D75D3 /* SwiftUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 71159EE12E63865B006D75D3 /* SwiftUI.framework */; };
 		71159EF32E63865D006D75D3 /* iOS WidgetExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 71159EDD2E63865B006D75D3 /* iOS WidgetExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
@@ -444,7 +441,7 @@
 			attributes = {
 				BuildIndependentTargetsInParallel = 1;
 				LastSwiftUpdateCheck = 1640;
-				LastUpgradeCheck = 1500;
+				LastUpgradeCheck = 2630;
 				TargetAttributes = {
 					71159EDC2E63865B006D75D3 = {
 						CreatedOnToolsVersion = 16.4;
@@ -536,7 +533,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				CAA270EC2AE99C3D007D9E3E /* Preview Assets.xcassets in Resources */,
-				71159ED62E63828C006D75D3 /* Config.xcconfig in Resources */,
 				71A64A032F09AE91000C384A /* GlassIcon.icon in Resources */,
 				CAA270E92AE99C3D007D9E3E /* Assets.xcassets in Resources */,
 			);
@@ -546,7 +542,6 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				71159ED72E63828C006D75D3 /* Config.xcconfig in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -554,7 +549,6 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				71159ED82E63828C006D75D3 /* Config.xcconfig in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -902,6 +896,7 @@
 				ONLY_ACTIVE_ARCH = YES;
 				OTHER_LDFLAGS = "";
 				SDKROOT = iphoneos;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
 				SWIFT_OBJC_BRIDGING_HEADER = "";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
@@ -960,6 +955,7 @@
 				MTL_FAST_MATH = YES;
 				OTHER_LDFLAGS = "";
 				SDKROOT = iphoneos;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SWIFT_COMPILATION_MODE = wholemodule;
 				SWIFT_OBJC_BRIDGING_HEADER = "";
 				VALIDATE_PRODUCT = YES;
