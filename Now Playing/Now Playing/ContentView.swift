@@ -133,21 +133,23 @@ struct ContentView: View {
                         .frame(maxWidth: 250)
 
                         // Secondary Controls
-                        HStack(spacing: 60) {
-                            Button(action: { spotifyController.skipBackward() }) {
-                                Image(systemName: "gobackward.\(skipInterval)")
-                                    .font(.title)
-                                    .foregroundColor(.white.opacity(0.9))
-                            }
+                        if skipInterval > 0 {
+                            HStack(spacing: 60) {
+                                Button(action: { spotifyController.skipBackward() }) {
+                                    Image(systemName: "gobackward.\(skipInterval)")
+                                        .font(.title)
+                                        .foregroundColor(.white.opacity(0.9))
+                                }
 
-                            Button(action: { spotifyController.skipForward() }) {
-                                Image(systemName: "goforward.\(skipInterval)")
-                                    .font(.title)
-                                    .foregroundColor(.white.opacity(0.9))
+                                Button(action: { spotifyController.skipForward() }) {
+                                    Image(systemName: "goforward.\(skipInterval)")
+                                        .font(.title)
+                                        .foregroundColor(.white.opacity(0.9))
+                                }
                             }
+                            .padding(.top, 5)
+                            .shadow(radius: 2)
                         }
-                        .padding(.top, 5)
-                        .shadow(radius: 2)
 
                     } else {
                         ProgressView()
@@ -250,6 +252,7 @@ struct ContentView: View {
                                 Text("Skip Interval")
                                     .font(.subheadline)
                                 Picker("Skip Interval", selection: $skipInterval) {
+                                    Text("None").tag(0)
                                     Text("5s").tag(5)
                                     Text("10s").tag(10)
                                     Text("15s").tag(15)
