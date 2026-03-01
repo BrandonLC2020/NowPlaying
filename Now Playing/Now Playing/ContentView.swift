@@ -196,6 +196,32 @@ struct ContentView: View {
             }
             .toolbar {
                 ToolbarItem(placement: .navigationBarLeading) {
+                    Menu {
+                        Section {
+                            Text("Account: \(spotifyController.currentUserDisplayName ?? "Loading...")")
+                        }
+                        
+                        Button(role: .destructive, action: {
+                            spotifyController.logout()
+                        }) {
+                            Label("Logout", systemImage: "rectangle.portrait.and.arrow.right")
+                        }
+                    } label: {
+                        if let userImage = spotifyController.currentUserImage {
+                            Image(uiImage: userImage)
+                                .resizable()
+                                .scaledToFill()
+                                .frame(width: 30, height: 30)
+                                .clipShape(Circle())
+                        } else {
+                            Image(systemName: "person.circle")
+                                .font(.title3)
+                                .foregroundColor(.primary)
+                        }
+                    }
+                }
+                
+                ToolbarItem(placement: .navigationBarTrailing) {
                     Button {
                         showingThemeSettings.toggle()
                     } label: {
@@ -252,32 +278,6 @@ struct ContentView: View {
                         .padding()
                         .frame(width: 300)
                         .presentationCompactAdaptation(.popover)
-                    }
-                }
-                
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    Menu {
-                        Section {
-                            Text("Account: \(spotifyController.currentUserDisplayName ?? "Loading...")")
-                        }
-                        
-                        Button(role: .destructive, action: {
-                            spotifyController.logout()
-                        }) {
-                            Label("Logout", systemImage: "rectangle.portrait.and.arrow.right")
-                        }
-                    } label: {
-                        if let userImage = spotifyController.currentUserImage {
-                            Image(uiImage: userImage)
-                                .resizable()
-                                .scaledToFill()
-                                .frame(width: 30, height: 30)
-                                .clipShape(Circle())
-                        } else {
-                            Image(systemName: "person.circle")
-                                .font(.title3)
-                                .foregroundColor(.primary)
-                        }
                     }
                 }
             }
