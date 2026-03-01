@@ -110,6 +110,8 @@
 		71A64ADC2F09FE37000C384A /* AuthorizationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthorizationView.swift; sourceTree = "<group>"; };
 		71D4C63D2F5465A7008D372F /* PlaybackState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaybackState.swift; sourceTree = "<group>"; };
 		71D4C63F2F5465AD008D372F /* PlaybackControlIntents.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaybackControlIntents.swift; sourceTree = "<group>"; };
+		71D4C6452F54B8CA008D372F /* Now Playing.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = "Now Playing.entitlements"; sourceTree = "<group>"; };
+		71D4C6462F54B909008D372F /* iOS WidgetExtension.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = "iOS WidgetExtension.entitlements"; sourceTree = "<group>"; };
 		CA265FF92C4960A600C1B3DB /* Sample.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Sample.xcconfig; sourceTree = "<group>"; };
 		CA265FFA2C497B3800C1B3DB /* Now-Playing-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = "Now-Playing-Info.plist"; sourceTree = SOURCE_ROOT; };
 		CA265FFE2C4AD73500C1B3DB /* SpotifyController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpotifyController.swift; sourceTree = "<group>"; };
@@ -210,6 +212,7 @@
 		CAA270D82AE99C3A007D9E3E = {
 			isa = PBXGroup;
 			children = (
+				71D4C6462F54B909008D372F /* iOS WidgetExtension.entitlements */,
 				CAA270E32AE99C3B007D9E3E /* Now Playing */,
 				CAA270F42AE99C3E007D9E3E /* Now PlayingTests */,
 				CAA270FE2AE99C3E007D9E3E /* Now PlayingUITests */,
@@ -239,6 +242,7 @@
 		CAA270E32AE99C3B007D9E3E /* Now Playing */ = {
 			isa = PBXGroup;
 			children = (
+				71D4C6452F54B8CA008D372F /* Now Playing.entitlements */,
 				71A64ADC2F09FE37000C384A /* AuthorizationView.swift */,
 				71A64A022F09AE91000C384A /* GlassIcon.icon */,
 				CA265FF92C4960A600C1B3DB /* Sample.xcconfig */,
@@ -654,6 +658,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				ASSETCATALOG_COMPILER_WIDGET_BACKGROUND_COLOR_NAME = WidgetBackground;
+				CODE_SIGN_ENTITLEMENTS = "iOS WidgetExtension.entitlements";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = YNT6PGUJ53;
@@ -682,6 +687,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				ASSETCATALOG_COMPILER_WIDGET_BACKGROUND_COLOR_NAME = WidgetBackground;
+				CODE_SIGN_ENTITLEMENTS = "iOS WidgetExtension.entitlements";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = YNT6PGUJ53;
@@ -969,6 +975,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = GlassIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
+				CODE_SIGN_ENTITLEMENTS = "Now Playing/Now Playing.entitlements";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"Now Playing/Preview Content\"";
@@ -1003,6 +1010,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = GlassIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
+				CODE_SIGN_ENTITLEMENTS = "Now Playing/Now Playing.entitlements";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"Now Playing/Preview Content\"";
