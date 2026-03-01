@@ -199,7 +199,7 @@ struct ContentView: View {
                     Button {
                         showingThemeSettings.toggle()
                     } label: {
-                        Image(systemName: "paintpalette")
+                        Image(systemName: "gear")
                             .foregroundColor(.primary)
                     }
                     .popover(isPresented: $showingThemeSettings) {
