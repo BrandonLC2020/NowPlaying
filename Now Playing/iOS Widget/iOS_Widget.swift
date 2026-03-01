@@ -7,50 +7,105 @@
 
 import WidgetKit
 import SwiftUI
+import AppIntents
 
-struct Provider: AppIntentTimelineProvider {
+struct Provider: TimelineProvider {
     func placeholder(in context: Context) -> SimpleEntry {
-        SimpleEntry(date: Date(), configuration: ConfigurationAppIntent())
+        SimpleEntry(date: Date(), state: .empty, image: nil)
     }
 
-    func snapshot(for configuration: ConfigurationAppIntent, in context: Context) async -> SimpleEntry {
-        SimpleEntry(date: Date(), configuration: configuration)
-    }
-    
-    func timeline(for configuration: ConfigurationAppIntent, in context: Context) async -> Timeline<SimpleEntry> {
-        var entries: [SimpleEntry] = []
-
-        // Generate a timeline consisting of five entries an hour apart, starting from the current date.
-        let currentDate = Date()
-        for hourOffset in 0 ..< 5 {
-            let entryDate = Calendar.current.date(byAdding: .hour, value: hourOffset, to: currentDate)!
-            let entry = SimpleEntry(date: entryDate, configuration: configuration)
-            entries.append(entry)
-        }
-
-        return Timeline(entries: entries, policy: .atEnd)
+    func getSnapshot(in context: Context, completion: @escaping (SimpleEntry) -> ()) {
+        let state = PlaybackStateManager.shared.load()
+        let image = PlaybackStateManager.shared.loadImage()
+        let entry = SimpleEntry(date: Date(), state: state, image: image)
+        completion(entry)
     }
 
-//    func relevances() async -> WidgetRelevances<ConfigurationAppIntent> {
-//        // Generate a list containing the contexts this widget is relevant in.
-//    }
+    func getTimeline(in context: Context, completion: @escaping (Timeline<SimpleEntry>) -> ()) {
+        let state = PlaybackStateManager.shared.load()
+        let image = PlaybackStateManager.shared.loadImage()
+        let entry = SimpleEntry(date: Date(), state: state, image: image)
+
+        // Refresh every 15 minutes if no updates come in
+        let timeline = Timeline(entries: [entry], policy: .after(Date().addingTimeInterval(900)))
+        completion(timeline)
+    }
 }
 
 struct SimpleEntry: TimelineEntry {
     let date: Date
-    let configuration: ConfigurationAppIntent
+    let state: PlaybackState
+    let image: UIImage?
 }
 
 struct iOS_WidgetEntryView : View {
     var entry: Provider.Entry
 
     var body: some View {
-        VStack {
-            Text("Time:")
-            Text(entry.date, style: .time)
-
-            Text("Favorite Emoji:")
-            Text(entry.configuration.favoriteEmoji)
+        VStack(spacing: 8) {
+            HStack(spacing: 12) {
+                if let image = entry.image {
+                    Image(uiImage: image)
+                        .resizable()
+                        .aspectRatio(contentMode: .fill)
+                        .frame(width: 50, height: 50)
+                        .cornerRadius(12)
+                        .shadow(radius: 4)
+                } else {
+                    RoundedRectangle(cornerRadius: 12)
+                        .fill(.ultraThinMaterial)
+                        .frame(width: 50, height: 50)
+                        .overlay(
+                            Image(systemName: "music.note")
+                                .foregroundColor(.secondary)
+                        )
+                }
+                
+                VStack(alignment: .leading, spacing: 1) {
+                    Text(entry.state.trackName)
+                        .font(.system(.subheadline, weight: .bold))
+                        .lineLimit(1)
+                    Text(entry.state.artistName)
+                        .font(.system(.caption, weight: .medium))
+                        .foregroundColor(.secondary)
+                        .lineLimit(1)
+                }
+                Spacer()
+            }
+            
+            HStack(spacing: 24) {
+                Button(intent: SkipPreviousIntent()) {
+                    Image(systemName: "backward.fill")
+                        .font(.title3)
+                }
+                .buttonStyle(.plain)
+                
+                Button(intent: PlayPauseIntent()) {
+                    Image(systemName: entry.state.isPaused ? "play.fill" : "pause.fill")
+                        .font(.title2)
+                }
+                .buttonStyle(.plain)
+                
+                Button(intent: SkipNextIntent()) {
+                    Image(systemName: "forward.fill")
+                        .font(.title3)
+                }
+                .buttonStyle(.plain)
+            }
+            .padding(.top, 4)
+        }
+        .containerBackground(for: .widget) {
+            ZStack {
+                Color.black.opacity(0.1)
+                if let image = entry.image {
+                    Image(uiImage: image)
+                        .resizable()
+                        .scaledToFill()
+                        .blur(radius: 20)
+                        .opacity(0.4)
+                }
+                Rectangle().fill(.ultraThinMaterial)
+            }
         }
     }
 }
@@ -59,30 +114,17 @@ struct iOS_Widget: Widget {
     let kind: String = "iOS_Widget"
 
     var body: some WidgetConfiguration {
-        AppIntentConfiguration(kind: kind, intent: ConfigurationAppIntent.self, provider: Provider()) { entry in
+        StaticConfiguration(kind: kind, provider: Provider()) { entry in
             iOS_WidgetEntryView(entry: entry)
-                .containerBackground(.fill.tertiary, for: .widget)
         }
-    }
-}
-
-extension ConfigurationAppIntent {
-    fileprivate static var smiley: ConfigurationAppIntent {
-        let intent = ConfigurationAppIntent()
-        intent.favoriteEmoji = "😀"
-        return intent
-    }
-    
-    fileprivate static var starEyes: ConfigurationAppIntent {
-        let intent = ConfigurationAppIntent()
-        intent.favoriteEmoji = "🤩"
-        return intent
+        .configurationDisplayName("Now Playing")
+        .description("Control your Spotify playback.")
+        .supportedFamilies([.systemSmall, .systemMedium])
     }
 }
 
 #Preview(as: .systemSmall) {
     iOS_Widget()
 } timeline: {
-    SimpleEntry(date: .now, configuration: .smiley)
-    SimpleEntry(date: .now, configuration: .starEyes)
+    SimpleEntry(date: Date(), state: .empty, image: nil)
 }

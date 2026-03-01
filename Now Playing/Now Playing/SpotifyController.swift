@@ -8,6 +8,7 @@
 import Combine
 import SpotifyiOS
 import SwiftUI
+import WidgetKit
 
 @MainActor
 final class SpotifyController: NSObject, ObservableObject {
@@ -24,7 +25,9 @@ final class SpotifyController: NSObject, ObservableObject {
     @Published var currentTrackArtist: String?
     @Published var currentTrackDuration: Int?
     @Published var currentTrackImage: UIImage?
-    @Published var isPaused: Bool = true
+    @Published var isPaused: Bool = true {
+        didSet { saveState() }
+    }
 
     @Published var currentTrackPosition: Int = 0
     private var timer: Timer?
@@ -32,6 +35,21 @@ final class SpotifyController: NSObject, ObservableObject {
     private var connectCancellable: AnyCancellable?
 
     private var disconnectCancellable: AnyCancellable?
+
+    private func saveState() {
+        let state = PlaybackState(
+            trackName: currentTrackName ?? "Not Playing",
+            artistName: currentTrackArtist ?? "Unknown Artist",
+            isPaused: isPaused,
+            trackURI: currentTrackURI ?? "",
+            duration: currentTrackDuration ?? 0,
+            position: currentTrackPosition,
+            lastUpdated: Date()
+        )
+        PlaybackStateManager.shared.save(state)
+        PlaybackStateManager.shared.saveImage(currentTrackImage)
+        WidgetCenter.shared.reloadAllTimelines()
+    }
 
     func setAccessToken(from url: URL) {
         let parameters = appRemote.authorizationParameters(from: url)
@@ -268,5 +286,6 @@ extension SpotifyController: SPTAppRemotePlayerStateDelegate {
         }
 
         fetchImage()
+        saveState()
     }
 }
