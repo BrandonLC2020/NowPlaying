@@ -34,6 +34,8 @@ final class SpotifyController: NSObject, ObservableObject {
     @Published var currentTrackPosition: Int = 0
     @Published var skipInterval: Int = 15
     @Published var waypoints: [Waypoint] = []
+    @Published var isShuffling: Bool = false
+    @Published var repeatMode: UInt = 0
     private var timer: Timer?
 
     private var connectCancellable: AnyCancellable?
@@ -180,7 +182,9 @@ final class SpotifyController: NSObject, ObservableObject {
                     if let images = json["images"] as? [[String: Any]],
                        let firstImage = images.first,
                        let imageUrl = firstImage["url"] as? String {
-                        self.fetchUserImage(from: imageUrl)
+                        Task { @MainActor in
+                            self.fetchUserImage(from: imageUrl)
+                        }
                     }
                 }
             } catch {
@@ -325,16 +329,51 @@ final class SpotifyController: NSObject, ObservableObject {
             }
         }
     }
+
+    func toggleShuffle() {
+        appRemote.playerAPI?.setShuffle(!isShuffling, callback: { result, error in
+            if let error = error {
+                print("Error setting shuffle: \(error.localizedDescription)")
+            }
+        })
+    }
+
+    func toggleRepeat() {
+        appRemote.playerAPI?.getPlayerState { (result, error) in
+            if let playerState = result as? SPTAppRemotePlayerState {
+                let currentMode = playerState.playbackOptions.repeatMode
+                var nextMode = currentMode
+                
+                // Cycle: off (0) -> track (1) -> context (2) -> off (0)
+                if currentMode.rawValue == 0 {
+                    nextMode = .track
+                } else if currentMode.rawValue == 1 {
+                    nextMode = .context
+                } else {
+                    nextMode = .off
+                }
+                
+                self.appRemote.playerAPI?.setRepeatMode(nextMode, callback: { result, error in
+                    if let error = error {
+                        print("Error setting repeat mode: \(error.localizedDescription)")
+                    }
+                })
+            }
+        }
+    }
+
     // [NEW] Timer Methods
     private func startTimer() {
         stopTimer()  // Prevent duplicate timers
         timer = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) {
-            [weak self] _ in
-            guard let self = self else { return }
-            if self.currentTrackPosition
-                < (self.currentTrackDuration ?? Int.max)
-            {
-                self.currentTrackPosition += 1
+            _ in
+            Task { @MainActor [weak self] in
+                guard let self = self else { return }
+                if self.currentTrackPosition
+                    < (self.currentTrackDuration ?? Int.max)
+                {
+                    self.currentTrackPosition += 1
+                }
             }
         }
     }
@@ -345,7 +384,7 @@ final class SpotifyController: NSObject, ObservableObject {
     }
 }
 
-extension SpotifyController: SPTAppRemoteDelegate {
+extension SpotifyController: @preconcurrency SPTAppRemoteDelegate {
     func appRemoteDidEstablishConnection(_ appRemote: SPTAppRemote) {
         self.appRemote = appRemote
         self.appRemote.playerAPI?.delegate = self
@@ -375,7 +414,7 @@ extension SpotifyController: SPTAppRemoteDelegate {
     }
 }
 
-extension SpotifyController: SPTAppRemotePlayerStateDelegate {
+extension SpotifyController: @preconcurrency SPTAppRemotePlayerStateDelegate {
     func playerStateDidChange(_ playerState: SPTAppRemotePlayerState) {
         let oldURI = self.currentTrackURI
         self.currentTrackURI = playerState.track.uri
@@ -388,6 +427,8 @@ extension SpotifyController: SPTAppRemotePlayerStateDelegate {
         self.currentTrackArtist = playerState.track.artist.name
         self.currentTrackDuration = Int(playerState.track.duration) / 1000
         self.isPaused = playerState.isPaused
+        self.isShuffling = playerState.playbackOptions.isShuffling
+        self.repeatMode = playerState.playbackOptions.repeatMode.rawValue
 
         // [NEW] Update position and manage timer
         self.currentTrackPosition = Int(playerState.playbackPosition) / 1000
