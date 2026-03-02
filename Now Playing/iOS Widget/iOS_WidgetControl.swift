@@ -9,7 +9,7 @@ import AppIntents
 import SwiftUI
 import WidgetKit
 
-struct iOS_WidgetControl: ControlWidget {
+struct IOSWidgetControl: ControlWidget {
     static let kind: String = "memo.com.Now-Playing.iOS Widget"
 
     var body: some ControlWidgetConfiguration {
@@ -30,7 +30,7 @@ struct iOS_WidgetControl: ControlWidget {
     }
 }
 
-extension iOS_WidgetControl {
+extension IOSWidgetControl {
     struct Value {
         var isRunning: Bool
         var name: String
@@ -38,12 +38,12 @@ extension iOS_WidgetControl {
 
     struct Provider: AppIntentControlValueProvider {
         func previewValue(configuration: TimerConfiguration) -> Value {
-            iOS_WidgetControl.Value(isRunning: false, name: configuration.timerName)
+            IOSWidgetControl.Value(isRunning: false, name: configuration.timerName)
         }
 
         func currentValue(configuration: TimerConfiguration) async throws -> Value {
             let isRunning = true // Check if the timer is running
-            return iOS_WidgetControl.Value(isRunning: isRunning, name: configuration.timerName)
+            return IOSWidgetControl.Value(isRunning: isRunning, name: configuration.timerName)
         }
     }
 }

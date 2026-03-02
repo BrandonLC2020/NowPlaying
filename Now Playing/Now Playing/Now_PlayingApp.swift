@@ -8,7 +8,7 @@
 import SwiftUI
 
 @main
-struct Now_PlayingApp: App {
+struct NowPlayingApp: App {
     @StateObject var spotifyController = SpotifyController()
 
     var body: some Scene {

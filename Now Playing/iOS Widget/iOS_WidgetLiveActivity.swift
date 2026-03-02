@@ -9,7 +9,7 @@ import ActivityKit
 import WidgetKit
 import SwiftUI
 
-struct iOS_WidgetAttributes: ActivityAttributes {
+struct IOSWidgetAttributes: ActivityAttributes {
     public struct ContentState: Codable, Hashable {
         // Dynamic stateful properties about your activity go here!
         var emoji: String
@@ -19,9 +19,9 @@ struct iOS_WidgetAttributes: ActivityAttributes {
     var name: String
 }
 
-struct iOS_WidgetLiveActivity: Widget {
+struct IOSWidgetLiveActivity: Widget {
     var body: some WidgetConfiguration {
-        ActivityConfiguration(for: iOS_WidgetAttributes.self) { context in
+        ActivityConfiguration(for: IOSWidgetAttributes.self) { context in
             // Lock screen/banner UI goes here
             VStack {
                 Text("Hello \(context.state.emoji)")
@@ -56,25 +56,25 @@ struct iOS_WidgetLiveActivity: Widget {
     }
 }
 
-extension iOS_WidgetAttributes {
-    fileprivate static var preview: iOS_WidgetAttributes {
-        iOS_WidgetAttributes(name: "World")
+extension IOSWidgetAttributes {
+    fileprivate static var preview: IOSWidgetAttributes {
+        IOSWidgetAttributes(name: "World")
     }
 }
 
-extension iOS_WidgetAttributes.ContentState {
-    fileprivate static var smiley: iOS_WidgetAttributes.ContentState {
-        iOS_WidgetAttributes.ContentState(emoji: "😀")
+extension IOSWidgetAttributes.ContentState {
+    fileprivate static var smiley: IOSWidgetAttributes.ContentState {
+        IOSWidgetAttributes.ContentState(emoji: "😀")
      }
-     
-     fileprivate static var starEyes: iOS_WidgetAttributes.ContentState {
-         iOS_WidgetAttributes.ContentState(emoji: "🤩")
+
+     fileprivate static var starEyes: IOSWidgetAttributes.ContentState {
+         IOSWidgetAttributes.ContentState(emoji: "🤩")
      }
 }
 
-#Preview("Notification", as: .content, using: iOS_WidgetAttributes.preview) {
-   iOS_WidgetLiveActivity()
+#Preview("Notification", as: .content, using: IOSWidgetAttributes.preview) {
+   IOSWidgetLiveActivity()
 } contentStates: {
-    iOS_WidgetAttributes.ContentState.smiley
-    iOS_WidgetAttributes.ContentState.starEyes
+    IOSWidgetAttributes.ContentState.smiley
+    IOSWidgetAttributes.ContentState.starEyes
 }

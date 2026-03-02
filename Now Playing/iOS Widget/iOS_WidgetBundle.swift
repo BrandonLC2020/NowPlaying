@@ -9,10 +9,10 @@ import WidgetKit
 import SwiftUI
 
 @main
-struct iOS_WidgetBundle: WidgetBundle {
+struct IOSWidgetBundle: WidgetBundle {
     var body: some Widget {
-        iOS_Widget()
-        iOS_WidgetControl()
-        iOS_WidgetLiveActivity()
+        IOSWidget()
+        IOSWidgetControl()
+        IOSWidgetLiveActivity()
     }
 }

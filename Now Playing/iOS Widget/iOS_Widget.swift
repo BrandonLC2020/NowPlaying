@@ -14,14 +14,14 @@ struct Provider: TimelineProvider {
         SimpleEntry(date: Date(), state: .empty, image: nil)
     }
 
-    func getSnapshot(in context: Context, completion: @escaping (SimpleEntry) -> ()) {
+    func getSnapshot(in context: Context, completion: @escaping (SimpleEntry) -> Void) {
         let state = PlaybackStateManager.shared.load()
         let image = PlaybackStateManager.shared.loadImage()
         let entry = SimpleEntry(date: Date(), state: state, image: image)
         completion(entry)
     }
 
-    func getTimeline(in context: Context, completion: @escaping (Timeline<SimpleEntry>) -> ()) {
+    func getTimeline(in context: Context, completion: @escaping (Timeline<SimpleEntry>) -> Void) {
         let state = PlaybackStateManager.shared.load()
         let image = PlaybackStateManager.shared.loadImage()
         let entry = SimpleEntry(date: Date(), state: state, image: image)
@@ -38,7 +38,7 @@ struct SimpleEntry: TimelineEntry {
     let image: UIImage?
 }
 
-struct iOS_WidgetEntryView : View {
+struct IOSWidgetEntryView: View {
     var entry: Provider.Entry
 
     var body: some View {
@@ -60,7 +60,7 @@ struct iOS_WidgetEntryView : View {
                                 .foregroundColor(.secondary)
                         )
                 }
-                
+
                 VStack(alignment: .leading, spacing: 1) {
                     Text(entry.state.trackName)
                         .font(.system(.subheadline, weight: .bold))
@@ -72,20 +72,20 @@ struct iOS_WidgetEntryView : View {
                 }
                 Spacer()
             }
-            
+
             HStack(spacing: 24) {
                 Button(intent: SkipPreviousIntent()) {
                     Image(systemName: "backward.fill")
                         .font(.title3)
                 }
                 .buttonStyle(.plain)
-                
+
                 Button(intent: PlayPauseIntent()) {
                     Image(systemName: entry.state.isPaused ? "play.fill" : "pause.fill")
                         .font(.title2)
                 }
                 .buttonStyle(.plain)
-                
+
                 Button(intent: SkipNextIntent()) {
                     Image(systemName: "forward.fill")
                         .font(.title3)
@@ -110,12 +110,12 @@ struct iOS_WidgetEntryView : View {
     }
 }
 
-struct iOS_Widget: Widget {
+struct IOSWidget: Widget {
     let kind: String = "iOS_Widget"
 
     var body: some WidgetConfiguration {
         StaticConfiguration(kind: kind, provider: Provider()) { entry in
-            iOS_WidgetEntryView(entry: entry)
+            IOSWidgetEntryView(entry: entry)
         }
         .configurationDisplayName("Now Playing")
         .description("Control your Spotify playback.")
@@ -124,7 +124,7 @@ struct iOS_Widget: Widget {
 }
 
 #Preview(as: .systemSmall) {
-    iOS_Widget()
+    IOSWidget()
 } timeline: {
     SimpleEntry(date: Date(), state: .empty, image: nil)
 }

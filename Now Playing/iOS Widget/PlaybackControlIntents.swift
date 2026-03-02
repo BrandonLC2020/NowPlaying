@@ -11,7 +11,7 @@ import WidgetKit
 struct PlayPauseIntent: AppIntent {
     static var title: LocalizedStringResource = "Play/Pause"
     static var description = IntentDescription("Toggles playback.")
-    
+
     func perform() async throws -> some IntentResult {
         // Here we'd ideally trigger the SpotifyController
         // But SpotifyRemote requires a session.
@@ -21,7 +21,7 @@ struct PlayPauseIntent: AppIntent {
         newState.isPaused.toggle()
         newState.lastUpdated = Date()
         PlaybackStateManager.shared.save(newState)
-        
+
         WidgetCenter.shared.reloadAllTimelines()
         return .result()
     }
@@ -30,13 +30,13 @@ struct PlayPauseIntent: AppIntent {
 struct SkipNextIntent: AppIntent {
     static var title: LocalizedStringResource = "Skip Next"
     static var description = IntentDescription("Skips to the next track.")
-    
+
     func perform() async throws -> some IntentResult {
         // Increment track position or something to simulate
         var state = PlaybackStateManager.shared.load()
         state.lastUpdated = Date()
         PlaybackStateManager.shared.save(state)
-        
+
         WidgetCenter.shared.reloadAllTimelines()
         return .result()
     }
@@ -45,12 +45,12 @@ struct SkipNextIntent: AppIntent {
 struct SkipPreviousIntent: AppIntent {
     static var title: LocalizedStringResource = "Skip Previous"
     static var description = IntentDescription("Skips to the previous track.")
-    
+
     func perform() async throws -> some IntentResult {
         var state = PlaybackStateManager.shared.load()
         state.lastUpdated = Date()
         PlaybackStateManager.shared.save(state)
-        
+
         WidgetCenter.shared.reloadAllTimelines()
         return .result()
     }

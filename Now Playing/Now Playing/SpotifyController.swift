@@ -39,17 +39,17 @@ final class SpotifyController: NSObject, ObservableObject {
     private var timer: Timer?
 
     private var connectCancellable: AnyCancellable?
-    
+
     // Predefined colors for waypoints
     private let waypointColors = [
         "#FF5E5E", "#FFBB5C", "#FFD93D", "#6BCB77", "#4D96FF", "#B983FF", "#FF869E", "#54BAB9"
     ]
-    
+
     func addWaypoint() {
         let position = currentTrackPosition
         // Prevent duplicate waypoints at same second
         guard !waypoints.contains(where: { $0.position == position }) else { return }
-        
+
         let colorHex = waypointColors[waypoints.count % waypointColors.count]
         let newWaypoint = Waypoint(position: position, colorHex: colorHex)
         waypoints.append(newWaypoint)
@@ -57,31 +57,31 @@ final class SpotifyController: NSObject, ObservableObject {
         print("Waypoint added: \(newWaypoint.position)s. Total waypoints: \(waypoints.count)")
         saveWaypoints()
     }
-    
+
     func seek(to seconds: Int) {
-        appRemote.playerAPI?.seek(toPosition: seconds * 1000, callback: { (result, error) in
+        appRemote.playerAPI?.seek(toPosition: seconds * 1000, callback: { (_, error) in
             if let error = error {
                 print("Error seeking: \(error.localizedDescription)")
             }
         })
     }
-    
+
     func seekToWaypoint(_ waypoint: Waypoint) {
         seek(to: waypoint.position)
     }
-    
+
     func removeWaypoint(_ waypoint: Waypoint) {
         waypoints.removeAll { $0.id == waypoint.id }
         saveWaypoints()
     }
-    
+
     private func saveWaypoints() {
         guard let trackURI = currentTrackURI else { return }
         if let encoded = try? JSONEncoder().encode(waypoints) {
             UserDefaults.standard.set(encoded, forKey: "waypoints_\(trackURI)")
         }
     }
-    
+
     private func loadWaypoints(for trackURI: String) {
         if let data = UserDefaults.standard.data(forKey: "waypoints_\(trackURI)"),
            let decoded = try? JSONDecoder().decode([Waypoint].self, from: data) {
@@ -173,7 +173,7 @@ final class SpotifyController: NSObject, ObservableObject {
         var request = URLRequest(url: URL(string: "https://api.spotify.com/v1/me")!)
         request.setValue("Bearer \(accessToken)", forHTTPHeaderField: "Authorization")
 
-        URLSession.shared.dataTask(with: request) { data, response, error in
+        URLSession.shared.dataTask(with: request) { data, _, error in
             guard let data = data, error == nil else { return }
             do {
                 if let json = try JSONSerialization.jsonObject(with: data) as? [String: Any] {
@@ -182,7 +182,7 @@ final class SpotifyController: NSObject, ObservableObject {
                             self.currentUserDisplayName = displayName
                         }
                     }
-                    
+
                     if let images = json["images"] as? [[String: Any]],
                        let firstImage = images.first,
                        let imageUrl = firstImage["url"] as? String {
@@ -199,8 +199,8 @@ final class SpotifyController: NSObject, ObservableObject {
 
     private func fetchUserImage(from urlString: String) {
         guard let url = URL(string: urlString) else { return }
-        
-        URLSession.shared.dataTask(with: url) { data, response, error in
+
+        URLSession.shared.dataTask(with: url) { data, _, error in
             guard let data = data, error == nil, let image = UIImage(data: data) else { return }
             DispatchQueue.main.async {
                 self.currentUserImage = image
@@ -252,7 +252,7 @@ final class SpotifyController: NSObject, ObservableObject {
     }
 
     func skipToPrevious() {
-        appRemote.playerAPI?.skip(toPrevious: { [weak self] result, error in
+        appRemote.playerAPI?.skip(toPrevious: { [weak self] _, error in
             if let error = error {
                 print(
                     "Error skipping to previous: \(error.localizedDescription)"
@@ -262,7 +262,7 @@ final class SpotifyController: NSObject, ObservableObject {
     }
 
     func play() {
-        appRemote.playerAPI?.resume({ [weak self] result, error in
+        appRemote.playerAPI?.resume({ [weak self] _, error in
             if let error = error {
                 print("Error playing: \(error.localizedDescription)")
             }
@@ -270,7 +270,7 @@ final class SpotifyController: NSObject, ObservableObject {
     }
 
     func pause() {
-        appRemote.playerAPI?.pause({ [weak self] result, error in
+        appRemote.playerAPI?.pause({ [weak self] _, error in
             if let error = error {
                 print("Error pausing: \(error.localizedDescription)")
             }
@@ -278,7 +278,7 @@ final class SpotifyController: NSObject, ObservableObject {
     }
 
     func skipToNext() {
-        appRemote.playerAPI?.skip(toNext: { [weak self] result, error in
+        appRemote.playerAPI?.skip(toNext: { [weak self] _, error in
             if let error = error {
                 print("Error skipping to next: \(error.localizedDescription)")
             }
@@ -297,7 +297,7 @@ final class SpotifyController: NSObject, ObservableObject {
 
                 self.appRemote.playerAPI?.seek(
                     toPosition: newPosition,
-                    callback: { (result, error) in
+                    callback: { (_, error) in
                         if let error = error {
                             print(
                                 "Error seeking backward: \(error.localizedDescription)"
@@ -322,7 +322,7 @@ final class SpotifyController: NSObject, ObservableObject {
 
                 self.appRemote.playerAPI?.seek(
                     toPosition: newPosition,
-                    callback: { (result, error) in
+                    callback: { (_, error) in
                         if let error = error {
                             print(
                                 "Error seeking forward: \(error.localizedDescription)"
@@ -335,7 +335,7 @@ final class SpotifyController: NSObject, ObservableObject {
     }
 
     func toggleShuffle() {
-        appRemote.playerAPI?.setShuffle(!isShuffling, callback: { result, error in
+        appRemote.playerAPI?.setShuffle(!isShuffling, callback: { _, error in
             if let error = error {
                 print("Error setting shuffle: \(error.localizedDescription)")
             }
@@ -347,7 +347,7 @@ final class SpotifyController: NSObject, ObservableObject {
             if let playerState = result as? SPTAppRemotePlayerState {
                 let currentMode = playerState.playbackOptions.repeatMode
                 var nextMode = currentMode
-                
+
                 // Cycle: off (0) -> track (1) -> context (2) -> off (0)
                 if currentMode.rawValue == 0 {
                     nextMode = .track
@@ -356,8 +356,8 @@ final class SpotifyController: NSObject, ObservableObject {
                 } else {
                     nextMode = .off
                 }
-                
-                self.appRemote.playerAPI?.setRepeatMode(nextMode, callback: { result, error in
+
+                self.appRemote.playerAPI?.setRepeatMode(nextMode, callback: { _, error in
                     if let error = error {
                         print("Error setting repeat mode: \(error.localizedDescription)")
                     }
@@ -374,8 +374,7 @@ final class SpotifyController: NSObject, ObservableObject {
             Task { @MainActor [weak self] in
                 guard let self = self else { return }
                 if self.currentTrackPosition
-                    < (self.currentTrackDuration ?? Int.max)
-                {
+                    < (self.currentTrackDuration ?? Int.max) {
                     self.currentTrackPosition += 1
                 }
             }
@@ -392,7 +391,7 @@ extension SpotifyController: @preconcurrency SPTAppRemoteDelegate {
     func appRemoteDidEstablishConnection(_ appRemote: SPTAppRemote) {
         self.appRemote = appRemote
         self.appRemote.playerAPI?.delegate = self
-        self.appRemote.playerAPI?.subscribe(toPlayerState: { (result, error) in
+        self.appRemote.playerAPI?.subscribe(toPlayerState: { (_, error) in
             if let error = error {
                 print(
                     "Error subscribing to player state: \(error.localizedDescription)"
@@ -422,11 +421,11 @@ extension SpotifyController: @preconcurrency SPTAppRemotePlayerStateDelegate {
     func playerStateDidChange(_ playerState: SPTAppRemotePlayerState) {
         let oldURI = self.currentTrackURI
         self.currentTrackURI = playerState.track.uri
-        
+
         if oldURI != self.currentTrackURI, let newURI = self.currentTrackURI {
             loadWaypoints(for: newURI)
         }
-        
+
         self.currentTrackName = playerState.track.name
         self.currentTrackArtist = playerState.track.artist.name
         self.currentTrackDuration = Int(playerState.track.duration) / 1000

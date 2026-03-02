@@ -7,9 +7,9 @@
 
 import XCTest
 
-final class watchOS_Watch_AppUITestsLaunchTests: XCTestCase {
+final class WatchOSWatchAppUITestsLaunchTests: XCTestCase {
 
-    override class var runsForEachTargetApplicationUIConfiguration: Bool {
+    override static var runsForEachTargetApplicationUIConfiguration: Bool {
         true
     }
 
