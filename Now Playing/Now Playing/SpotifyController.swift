@@ -58,12 +58,16 @@ final class SpotifyController: NSObject, ObservableObject {
         saveWaypoints()
     }
     
-    func seekToWaypoint(_ waypoint: Waypoint) {
-        appRemote.playerAPI?.seek(toPosition: waypoint.position * 1000, callback: { (result, error) in
+    func seek(to seconds: Int) {
+        appRemote.playerAPI?.seek(toPosition: seconds * 1000, callback: { (result, error) in
             if let error = error {
-                print("Error seeking to waypoint: \(error.localizedDescription)")
+                print("Error seeking: \(error.localizedDescription)")
             }
         })
+    }
+    
+    func seekToWaypoint(_ waypoint: Waypoint) {
+        seek(to: waypoint.position)
     }
     
     func removeWaypoint(_ waypoint: Waypoint) {

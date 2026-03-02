@@ -22,6 +22,7 @@ struct ContentView: View {
     @AppStorage("skipInterval") private var skipInterval: Int = 15
     
     @State private var showingThemeSettings = false
+    @State private var scrubbingPosition: Double? = nil
 
     var body: some View {
         NavigationView {
@@ -131,16 +132,26 @@ struct ContentView: View {
                                 // Progress Bar Layer
                                 VStack(spacing: 4) {
                                     ZStack(alignment: .leading) {
-                                        ProgressView(
-                                            value: Double(spotifyController.currentTrackPosition),
-                                            total: Double(spotifyController.currentTrackDuration ?? 1)
-                                        )
-                                        .tint(.white)
+                                        Slider(
+                                            value: Binding(
+                                                get: { scrubbingPosition ?? Double(spotifyController.currentTrackPosition) },
+                                                set: { scrubbingPosition = $0 }
+                                            ),
+                                            in: 0...Double(max(1, spotifyController.currentTrackDuration ?? 1))
+                                        ) { scrubbing in
+                                            if !scrubbing {
+                                                if let newPos = scrubbingPosition {
+                                                    spotifyController.seek(to: Int(newPos))
+                                                    scrubbingPosition = nil
+                                                }
+                                            }
+                                        }
+                                        .accentColor(.white)
                                         
                                         // Waypoint Markers
                                         GeometryReader { geometry in
                                             ForEach(spotifyController.waypoints) { waypoint in
-                                                let percentage = CGFloat(waypoint.position) / CGFloat(spotifyController.currentTrackDuration ?? 1)
+                                                let percentage = CGFloat(waypoint.position) / CGFloat(max(1, spotifyController.currentTrackDuration ?? 1))
                                                 Circle()
                                                     .fill(waypoint.color)
                                                     .frame(width: 6, height: 6)
@@ -148,10 +159,11 @@ struct ContentView: View {
                                             }
                                         }
                                         .frame(height: 12)
+                                        .allowsHitTesting(false)
                                     }
                                     
                                     HStack {
-                                        Text(formatTime(spotifyController.currentTrackPosition))
+                                        Text(formatTime(Int(scrubbingPosition ?? Double(spotifyController.currentTrackPosition))))
                                         Spacer()
                                         
                                         Button(action: { spotifyController.addWaypoint() }) {
