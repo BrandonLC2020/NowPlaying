@@ -87,7 +87,13 @@ struct ContentView: View {
                                     .shadow(radius: 2)
 
                                 // Main Controls
-                                HStack(spacing: 35) {
+                                HStack(spacing: 25) {
+                                    Button(action: { spotifyController.toggleShuffle() }) {
+                                        Image(systemName: "shuffle")
+                                            .font(.body)
+                                            .foregroundColor(spotifyController.isShuffling ? .green : .white.opacity(0.6))
+                                    }
+                                    
                                     Button(action: { spotifyController.skipToPrevious() }) {
                                         Image(systemName: "backward.fill")
                                             .font(.title)
@@ -112,6 +118,12 @@ struct ContentView: View {
                                         Image(systemName: "forward.fill")
                                             .font(.title)
                                             .foregroundColor(.white)
+                                    }
+                                    
+                                    Button(action: { spotifyController.toggleRepeat() }) {
+                                        Image(systemName: spotifyController.repeatMode == 1 ? "repeat.1" : "repeat")
+                                            .font(.body)
+                                            .foregroundColor(spotifyController.repeatMode != 0 ? .green : .white.opacity(0.6))
                                     }
                                 }
                                 .padding(.top, 5)
