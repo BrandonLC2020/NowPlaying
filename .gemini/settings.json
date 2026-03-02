@@ -6,5 +6,35 @@
         "mcpbridge"
       ]
     }
+  },
+  "hooks": {
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "name": "spotify-status",
+            "type": "command",
+            "command": ".gemini/hooks/spotify_status.sh",
+            "description": "Provides Spotify SDK connection status and shared state."
+          },
+          {
+            "name": "active-waypoints",
+            "type": "command",
+            "command": ".gemini/hooks/active_waypoints.sh",
+            "description": "Lists waypoints for the current track URI."
+          },
+          {
+            "name": "theme-settings",
+            "type": "command",
+            "command": ".gemini/hooks/theme_settings.sh",
+            "description": "Shows current theme and glassmorphism settings."
+          }
+        ]
+      }
+    ]
+  },
+  "hooksConfig": {
+    "enabled": true,
+    "notifications": true
   }
 }
