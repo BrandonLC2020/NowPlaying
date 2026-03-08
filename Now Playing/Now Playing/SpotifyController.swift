@@ -59,6 +59,7 @@ final class SpotifyController: NSObject, ObservableObject {
     }
 
     func seek(to seconds: Int) {
+        self.currentTrackPosition = seconds
         appRemote.playerAPI?.seek(toPosition: seconds * 1000, callback: { (_, error) in
             if let error = error {
                 print("Error seeking: \(error.localizedDescription)")
@@ -286,14 +287,19 @@ final class SpotifyController: NSObject, ObservableObject {
     }
 
     func skipBackward() {
-        appRemote.playerAPI?.getPlayerState { (result, error) in
+        appRemote.playerAPI?.getPlayerState { [weak self] (result, error) in
+            guard let self = self else { return }
             if let error = error {
                 print(
                     "Error getting player state: \(error.localizedDescription)"
                 )
             } else if let playerState = result as? SPTAppRemotePlayerState {
                 let currentPosition = playerState.playbackPosition
-                let newPosition = max(0, currentPosition - (self.skipInterval * 1000))  // Ensure we don't go below 0
+                let newPosition = max(0, currentPosition - (self.skipInterval * 1000))
+                
+                Task { @MainActor in
+                    self.currentTrackPosition = Int(newPosition) / 1000
+                }
 
                 self.appRemote.playerAPI?.seek(
                     toPosition: newPosition,
@@ -310,7 +316,8 @@ final class SpotifyController: NSObject, ObservableObject {
     }
 
     func skipForward() {
-        appRemote.playerAPI?.getPlayerState { (result, error) in
+        appRemote.playerAPI?.getPlayerState { [weak self] (result, error) in
+            guard let self = self else { return }
             if let error = error {
                 print(
                     "Error getting player state: \(error.localizedDescription)"
@@ -318,7 +325,10 @@ final class SpotifyController: NSObject, ObservableObject {
             } else if let playerState = result as? SPTAppRemotePlayerState {
                 let currentPosition = playerState.playbackPosition
                 let newPosition = currentPosition + (self.skipInterval * 1000)
-                // Note: If newPosition > track duration, Spotify usually handles it by skipping to next.
+                
+                Task { @MainActor in
+                    self.currentTrackPosition = Int(newPosition) / 1000
+                }
 
                 self.appRemote.playerAPI?.seek(
                     toPosition: newPosition,
@@ -419,30 +429,32 @@ extension SpotifyController: @preconcurrency SPTAppRemoteDelegate {
 
 extension SpotifyController: @preconcurrency SPTAppRemotePlayerStateDelegate {
     func playerStateDidChange(_ playerState: SPTAppRemotePlayerState) {
-        let oldURI = self.currentTrackURI
-        self.currentTrackURI = playerState.track.uri
+        Task { @MainActor in
+            let oldURI = self.currentTrackURI
+            self.currentTrackURI = playerState.track.uri
 
-        if oldURI != self.currentTrackURI, let newURI = self.currentTrackURI {
-            loadWaypoints(for: newURI)
+            if oldURI != self.currentTrackURI, let newURI = self.currentTrackURI {
+                loadWaypoints(for: newURI)
+            }
+
+            self.currentTrackName = playerState.track.name
+            self.currentTrackArtist = playerState.track.artist.name
+            self.currentTrackDuration = Int(playerState.track.duration) / 1000
+            self.isPaused = playerState.isPaused
+            self.isShuffling = playerState.playbackOptions.isShuffling
+            self.repeatMode = playerState.playbackOptions.repeatMode.rawValue
+
+            // [NEW] Update position and manage timer
+            self.currentTrackPosition = Int(playerState.playbackPosition) / 1000
+
+            if self.isPaused {
+                stopTimer()
+            } else {
+                startTimer()
+            }
+
+            fetchImage()
+            saveState()
         }
-
-        self.currentTrackName = playerState.track.name
-        self.currentTrackArtist = playerState.track.artist.name
-        self.currentTrackDuration = Int(playerState.track.duration) / 1000
-        self.isPaused = playerState.isPaused
-        self.isShuffling = playerState.playbackOptions.isShuffling
-        self.repeatMode = playerState.playbackOptions.repeatMode.rawValue
-
-        // [NEW] Update position and manage timer
-        self.currentTrackPosition = Int(playerState.playbackPosition) / 1000
-
-        if self.isPaused {
-            stopTimer()
-        } else {
-            startTimer()
-        }
-
-        fetchImage()
-        saveState()
     }
 }
