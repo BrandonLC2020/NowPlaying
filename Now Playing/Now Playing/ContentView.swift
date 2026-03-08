@@ -319,18 +319,19 @@ struct MainControls: View {
 struct ProgressBarLayer: View {
     @EnvironmentObject var spotifyController: SpotifyController
     @Binding var scrubbingPosition: Double?
+    
+    @State private var localSliderValue: Double = 0
 
     var body: some View {
         VStack(spacing: 4) {
             ZStack(alignment: .leading) {
                 Slider(
-                    value: Binding(
-                        get: { scrubbingPosition ?? Double(spotifyController.currentTrackPosition) },
-                        set: { scrubbingPosition = $0 }
-                    ),
+                    value: $localSliderValue,
                     in: 0...Double(max(1, spotifyController.currentTrackDuration ?? 1))
                 ) { scrubbing in
-                    if !scrubbing {
+                    if scrubbing {
+                        scrubbingPosition = localSliderValue
+                    } else {
                         if let newPos = scrubbingPosition {
                             spotifyController.seek(to: Int(newPos))
                             scrubbingPosition = nil
@@ -338,6 +339,19 @@ struct ProgressBarLayer: View {
                     }
                 }
                 .accentColor(.white)
+                .onChange(of: localSliderValue) { newValue in
+                    if scrubbingPosition != nil {
+                        scrubbingPosition = newValue
+                    }
+                }
+                .onChange(of: spotifyController.currentTrackPosition) { newValue in
+                    if scrubbingPosition == nil {
+                        localSliderValue = Double(newValue)
+                    }
+                }
+                .onAppear {
+                    localSliderValue = Double(spotifyController.currentTrackPosition)
+                }
 
                 // Waypoint Markers
                 GeometryReader { geometry in
@@ -355,7 +369,7 @@ struct ProgressBarLayer: View {
             }
 
             HStack {
-                Text(Int(scrubbingPosition ?? Double(spotifyController.currentTrackPosition)).formatAsTime())
+                Text(Int(localSliderValue).formatAsTime())
                 Spacer()
 
                 Button(action: { spotifyController.addWaypoint() }) {
