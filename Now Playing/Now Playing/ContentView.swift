@@ -393,6 +393,7 @@ struct ProgressBarLayer: View {
 
 struct WaypointDock: View {
     @EnvironmentObject var spotifyController: SpotifyController
+    @State private var editingWaypoint: Waypoint?
 
     var body: some View {
         VStack(alignment: .center, spacing: 8) {
@@ -412,6 +413,12 @@ struct WaypointDock: View {
                                 Text(waypoint.position.formatAsTime())
                                     .font(.system(size: 10, weight: .medium, design: .monospaced))
                                     .foregroundColor(.white)
+                                if let label = waypoint.label, !label.isEmpty {
+                                    Text(label)
+                                        .font(.system(size: 8, weight: .regular))
+                                        .foregroundColor(.white.opacity(0.8))
+                                        .lineLimit(1)
+                                }
                             }
                             .frame(width: 45)
                             .padding(.vertical, 8)
@@ -421,6 +428,11 @@ struct WaypointDock: View {
                             )
                         }
                         .contextMenu {
+                            Button {
+                                editingWaypoint = waypoint
+                            } label: {
+                                Label("Edit", systemImage: "pencil")
+                            }
                             Button(role: .destructive) {
                                 spotifyController.removeWaypoint(waypoint)
                             } label: {
@@ -432,12 +444,80 @@ struct WaypointDock: View {
                 .padding(.horizontal, 12)
                 .frame(minWidth: 250)
             }
-            .frame(height: 50)
+            .frame(height: 60)
         }
         .frame(width: 250)
         .padding(.vertical, 12)
         .glassBackground()
         .environment(\.colorScheme, .dark)
+        .sheet(item: $editingWaypoint) { waypoint in
+            WaypointEditSheet(waypoint: waypoint)
+                .environmentObject(spotifyController)
+        }
+    }
+}
+
+struct WaypointEditSheet: View {
+    @EnvironmentObject var spotifyController: SpotifyController
+    let waypoint: Waypoint
+
+    @State private var label: String
+    @State private var selectedColorHex: String
+    @Environment(\.dismiss) private var dismiss
+
+    private let colorPalette = [
+        "#FF5E5E", "#FFBB5C", "#FFD93D", "#6BCB77",
+        "#4D96FF", "#B983FF", "#FF869E", "#54BAB9"
+    ]
+
+    init(waypoint: Waypoint) {
+        self.waypoint = waypoint
+        _label = State(initialValue: waypoint.label ?? "")
+        _selectedColorHex = State(initialValue: waypoint.colorHex)
+    }
+
+    var body: some View {
+        NavigationView {
+            Form {
+                Section("Label") {
+                    TextField("Optional label", text: $label)
+                }
+
+                Section("Color") {
+                    LazyVGrid(columns: Array(repeating: .init(.flexible()), count: 4), spacing: 16) {
+                        ForEach(colorPalette, id: \.self) { hex in
+                            Circle()
+                                .fill(Color(hex: hex) ?? .blue)
+                                .frame(width: 44, height: 44)
+                                .overlay(
+                                    Circle()
+                                        .stroke(Color.primary, lineWidth: selectedColorHex.uppercased() == hex.uppercased() ? 3 : 0)
+                                        .padding(2)
+                                )
+                                .onTapGesture { selectedColorHex = hex }
+                        }
+                    }
+                    .padding(.vertical, 8)
+                }
+            }
+            .navigationTitle("Edit Waypoint")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .cancellationAction) {
+                    Button("Cancel") { dismiss() }
+                }
+                ToolbarItem(placement: .confirmationAction) {
+                    Button("Save") {
+                        spotifyController.updateWaypoint(
+                            waypoint,
+                            label: label.isEmpty ? nil : label,
+                            colorHex: selectedColorHex
+                        )
+                        dismiss()
+                    }
+                }
+            }
+        }
     }
 }
 

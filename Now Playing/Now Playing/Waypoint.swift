@@ -11,15 +11,17 @@ struct Waypoint: Identifiable, Codable, Equatable {
     let id: UUID
     let position: Int // in seconds
     let colorHex: String
+    var label: String?
 
     var color: Color {
         Color(hex: colorHex) ?? .blue
     }
 
-    init(id: UUID = UUID(), position: Int, colorHex: String) {
+    init(id: UUID = UUID(), position: Int, colorHex: String, label: String? = nil) {
         self.id = id
         self.position = position
         self.colorHex = colorHex
+        self.label = label
     }
 }
 

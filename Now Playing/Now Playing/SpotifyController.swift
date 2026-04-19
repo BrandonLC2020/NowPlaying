@@ -83,11 +83,18 @@ final class SpotifyController: NSObject, ObservableObject {
         saveWaypoints()
     }
 
+    func updateWaypoint(_ waypoint: Waypoint, label: String?, colorHex: String) {
+        guard let index = waypoints.firstIndex(where: { $0.id == waypoint.id }) else { return }
+        waypoints[index] = Waypoint(id: waypoint.id, position: waypoint.position, colorHex: colorHex, label: label)
+        saveWaypoints()
+    }
+
     private func saveWaypoints() {
         guard let trackURI = currentTrackURI else { return }
         if let encoded = try? JSONEncoder().encode(waypoints) {
             UserDefaults.standard.set(encoded, forKey: "waypoints_\(trackURI)")
         }
+        saveState()
     }
 
     private func loadWaypoints(for trackURI: String) {
