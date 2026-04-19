@@ -45,10 +45,15 @@ final class SpotifyController: NSObject, ObservableObject {
         "#FF5E5E", "#FFBB5C", "#FFD93D", "#6BCB77", "#4D96FF", "#B983FF", "#FF869E", "#54BAB9"
     ]
 
+    private func haptic(_ style: UIImpactFeedbackGenerator.FeedbackStyle) {
+        UIImpactFeedbackGenerator(style: style).impactOccurred()
+    }
+
     func addWaypoint() {
         let position = currentTrackPosition
         // Prevent duplicate waypoints at same second
         guard !waypoints.contains(where: { $0.position == position }) else { return }
+        haptic(.medium)
 
         let colorHex = waypointColors[waypoints.count % waypointColors.count]
         let newWaypoint = Waypoint(position: position, colorHex: colorHex)
@@ -68,10 +73,12 @@ final class SpotifyController: NSObject, ObservableObject {
     }
 
     func seekToWaypoint(_ waypoint: Waypoint) {
+        haptic(.medium)
         seek(to: waypoint.position)
     }
 
     func removeWaypoint(_ waypoint: Waypoint) {
+        haptic(.heavy)
         waypoints.removeAll { $0.id == waypoint.id }
         saveWaypoints()
     }
@@ -253,6 +260,7 @@ final class SpotifyController: NSObject, ObservableObject {
     }
 
     func skipToPrevious() {
+        haptic(.medium)
         appRemote.playerAPI?.skip(toPrevious: { [weak self] _, error in
             if let error = error {
                 print(
@@ -263,6 +271,7 @@ final class SpotifyController: NSObject, ObservableObject {
     }
 
     func play() {
+        haptic(.heavy)
         appRemote.playerAPI?.resume({ [weak self] _, error in
             if let error = error {
                 print("Error playing: \(error.localizedDescription)")
@@ -271,6 +280,7 @@ final class SpotifyController: NSObject, ObservableObject {
     }
 
     func pause() {
+        haptic(.heavy)
         appRemote.playerAPI?.pause({ [weak self] _, error in
             if let error = error {
                 print("Error pausing: \(error.localizedDescription)")
@@ -279,6 +289,7 @@ final class SpotifyController: NSObject, ObservableObject {
     }
 
     func skipToNext() {
+        haptic(.medium)
         appRemote.playerAPI?.skip(toNext: { [weak self] _, error in
             if let error = error {
                 print("Error skipping to next: \(error.localizedDescription)")
@@ -287,6 +298,7 @@ final class SpotifyController: NSObject, ObservableObject {
     }
 
     func skipBackward() {
+        haptic(.light)
         appRemote.playerAPI?.getPlayerState { [weak self] (result, error) in
             guard let self = self else { return }
             if let error = error {
@@ -316,6 +328,7 @@ final class SpotifyController: NSObject, ObservableObject {
     }
 
     func skipForward() {
+        haptic(.light)
         appRemote.playerAPI?.getPlayerState { [weak self] (result, error) in
             guard let self = self else { return }
             if let error = error {
@@ -345,6 +358,7 @@ final class SpotifyController: NSObject, ObservableObject {
     }
 
     func toggleShuffle() {
+        haptic(.light)
         appRemote.playerAPI?.setShuffle(!isShuffling, callback: { _, error in
             if let error = error {
                 print("Error setting shuffle: \(error.localizedDescription)")
@@ -353,6 +367,7 @@ final class SpotifyController: NSObject, ObservableObject {
     }
 
     func toggleRepeat() {
+        haptic(.light)
         appRemote.playerAPI?.getPlayerState { (result, error) in
             if let playerState = result as? SPTAppRemotePlayerState {
                 let currentMode = playerState.playbackOptions.repeatMode

@@ -333,6 +333,7 @@ struct ProgressBarLayer: View {
                         scrubbingPosition = localSliderValue
                     } else {
                         if let newPos = scrubbingPosition {
+                            UIImpactFeedbackGenerator(style: .light).impactOccurred()
                             spotifyController.seek(to: Int(newPos))
                             scrubbingPosition = nil
                         }
