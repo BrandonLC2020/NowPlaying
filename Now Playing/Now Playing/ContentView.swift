@@ -110,6 +110,12 @@ struct ContentView: View {
                         .glassBackground()
                         .environment(\.colorScheme, .dark)
 
+                        // Disconnected banner
+                        if spotifyController.connectionState != .connected {
+                            DisconnectedBanner()
+                                .transition(.slideUpFade)
+                        }
+
                         // Waypoint Dock
                         if !spotifyController.waypoints.isEmpty {
                             WaypointDock()
@@ -118,6 +124,7 @@ struct ContentView: View {
                     }
                     .padding(20)
                     .animation(.spring(response: 0.45, dampingFraction: 0.78), value: spotifyController.waypoints.isEmpty)
+                    .animation(.easeInOut(duration: 0.3), value: spotifyController.connectionState == .connected)
 
                     Spacer()
                 }
@@ -558,6 +565,38 @@ struct WaypointEditSheet: View {
                 }
             }
         }
+    }
+}
+
+// MARK: - Disconnected Banner
+
+struct DisconnectedBanner: View {
+    @EnvironmentObject var spotifyController: SpotifyController
+
+    var body: some View {
+        HStack(spacing: 8) {
+            Image(systemName: "wifi.slash")
+                .font(.caption)
+
+            switch spotifyController.connectionState {
+            case .retrying(let attempt):
+                Text("Disconnected · Retrying in \(spotifyController.retryCountdown)s (\(attempt)/5)")
+                    .font(.caption)
+            case .failed:
+                Text("Failed to reconnect")
+                    .font(.caption)
+                Spacer()
+                Button("Retry") { spotifyController.reconnect() }
+                    .font(.caption.weight(.semibold))
+            case .connected:
+                EmptyView()
+            }
+        }
+        .foregroundColor(.white.opacity(0.9))
+        .padding(.horizontal, 14)
+        .padding(.vertical, 8)
+        .glassBackground()
+        .environment(\.colorScheme, .dark)
     }
 }
 

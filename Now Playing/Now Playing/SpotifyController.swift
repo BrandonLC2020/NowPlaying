@@ -6,9 +6,16 @@
 //
 
 import Combine
+import os
 import SpotifyiOS
 import SwiftUI
 import WidgetKit
+
+enum ConnectionState: Equatable {
+    case connected
+    case retrying(attempt: Int)
+    case failed
+}
 
 @MainActor
 final class SpotifyController: NSObject, ObservableObject {
@@ -50,7 +57,18 @@ final class SpotifyController: NSObject, ObservableObject {
     @Published var isShuffling: Bool = false
     /// Current repeat mode: `0` = off, `1` = track, `2` = context.
     @Published var repeatMode: UInt = 0
+    /// Current SDK connection state; drives the disconnected banner in ContentView.
+    @Published var connectionState: ConnectionState = .connected
+    /// Countdown in seconds until the next automatic reconnect attempt.
+    @Published var retryCountdown: Int = 0
     private var timer: Timer?
+
+    private let logger = Logger(subsystem: "com.brandonlamer-connolly.nowplaying", category: "SpotifyConnection")
+    private var retryAttempt = 0
+    private let maxRetries = 5
+    private let backoffDelays = [2, 4, 8, 16, 30]
+    private var retryTask: Task<Void, Never>?
+    private var isIntentionalDisconnect = false
 
     private var connectCancellable: AnyCancellable?
 
@@ -175,22 +193,35 @@ final class SpotifyController: NSObject, ObservableObject {
         return appRemote
     }()
 
-    /// Connects to the Spotify app remote. Requires `accessToken` to be set on `connectionParameters`.
+    /// Connects to the Spotify app remote. Requires `accessToken` to be set on `connectionParameters`. Cancels any pending retry.
     func connect() {
-        if self.appRemote.connectionParameters.accessToken != nil {
-            appRemote.connect()
-        }
+        retryTask?.cancel()
+        retryTask = nil
+        guard appRemote.connectionParameters.accessToken != nil else { return }
+        appRemote.connect()
+    }
+
+    /// Manually retries the SDK connection after a failure, resetting the backoff counter.
+    func reconnect() {
+        retryAttempt = 0
+        connectionState = .connected
+        connect()
     }
 
     /// Disconnects from the Spotify app remote. No-ops if not currently connected.
     func disconnect() {
-        if appRemote.isConnected {
-            appRemote.disconnect()
-        }
+        guard appRemote.isConnected else { return }
+        isIntentionalDisconnect = true
+        appRemote.disconnect()
     }
 
     /// Fully resets auth and playback state: disconnects, clears all published properties, stops the timer, and wipes the shared App Group.
     func logout() {
+        retryTask?.cancel()
+        retryTask = nil
+        retryAttempt = 0
+        retryCountdown = 0
+        connectionState = .connected
         disconnect()
         self.accessToken = nil
         self.currentTrackName = nil
@@ -450,17 +481,47 @@ final class SpotifyController: NSObject, ObservableObject {
         timer?.invalidate()
         timer = nil
     }
+
+    private func scheduleRetry() {
+        guard retryAttempt < maxRetries else {
+            connectionState = .failed
+            retryCountdown = 0
+            logger.warning("Max retries (\(self.maxRetries)) exhausted. Giving up.")
+            return
+        }
+        let delay = backoffDelays[retryAttempt]
+        retryAttempt += 1
+        connectionState = .retrying(attempt: retryAttempt)
+
+        retryTask?.cancel()
+        retryTask = Task { @MainActor [weak self] in
+            guard let self else { return }
+            var remaining = delay
+            while remaining > 0 {
+                guard !Task.isCancelled else { return }
+                self.retryCountdown = remaining
+                try? await Task.sleep(nanoseconds: 1_000_000_000)
+                remaining -= 1
+            }
+            guard !Task.isCancelled else { return }
+            self.logger.debug("Retrying connection (attempt \(self.retryAttempt)/\(self.maxRetries))...")
+            self.connect()
+        }
+    }
 }
 
 extension SpotifyController: @preconcurrency SPTAppRemoteDelegate {
     func appRemoteDidEstablishConnection(_ appRemote: SPTAppRemote) {
+        retryTask?.cancel()
+        retryTask = nil
+        retryAttempt = 0
+        connectionState = .connected
+        logger.info("Connection established.")
         self.appRemote = appRemote
         self.appRemote.playerAPI?.delegate = self
         self.appRemote.playerAPI?.subscribe(toPlayerState: { (_, error) in
             if let error = error {
-                print(
-                    "Error subscribing to player state: \(error.localizedDescription)"
-                )
+                print("Error subscribing to player state: \(error.localizedDescription)")
             } else {
                 print("Successfully subscribed to player state")
             }
@@ -471,14 +532,27 @@ extension SpotifyController: @preconcurrency SPTAppRemoteDelegate {
         _ appRemote: SPTAppRemote,
         didFailConnectionAttemptWithError error: Error?
     ) {
-        // Handle the connection failure
+        if let error = error {
+            logger.error("Connection attempt failed: \(error.localizedDescription)")
+        } else {
+            logger.debug("Connection attempt failed (no error description).")
+        }
+        guard accessToken != nil else { return }
+        scheduleRetry()
     }
 
     func appRemote(
         _ appRemote: SPTAppRemote,
         didDisconnectWithError error: Error?
     ) {
-        // Handle the connection loss
+        defer { isIntentionalDisconnect = false }
+        if let error = error {
+            logger.error("Disconnected with error: \(error.localizedDescription)")
+        } else {
+            logger.debug("Disconnected cleanly.")
+        }
+        guard !isIntentionalDisconnect else { return }
+        scheduleRetry()
     }
 }
 

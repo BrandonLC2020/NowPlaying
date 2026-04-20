@@ -330,6 +330,56 @@ struct SpotifyControllerSessionTests {
     }
 }
 
+// MARK: - SpotifyController Connection State Tests
+
+@Suite("SpotifyController Connection State")
+@MainActor
+struct SpotifyControllerConnectionStateTests {
+
+    @Test("connectionState initializes as .connected")
+    func initialConnectionState() {
+        let controller = SpotifyController()
+        #expect(controller.connectionState == .connected)
+    }
+
+    @Test("retryCountdown initializes to 0")
+    func initialRetryCountdown() {
+        let controller = SpotifyController()
+        #expect(controller.retryCountdown == 0)
+    }
+
+    @Test("logout() resets connectionState to .connected")
+    func logoutResetsConnectionState() {
+        let controller = SpotifyController()
+        controller.logout()
+        #expect(controller.connectionState == .connected)
+    }
+
+    @Test("reconnect() resets connectionState to .connected")
+    func reconnectResetsConnectionState() {
+        let controller = SpotifyController()
+        controller.reconnect()
+        #expect(controller.connectionState == .connected)
+    }
+
+    @Test("logout() resets retryCountdown to 0")
+    func logoutResetsRetryCountdown() {
+        let controller = SpotifyController()
+        controller.retryCountdown = 12
+        controller.logout()
+        #expect(controller.retryCountdown == 0)
+    }
+
+    @Test("ConnectionState cases are distinct and Equatable")
+    func connectionStateEquality() {
+        #expect(ConnectionState.connected == .connected)
+        #expect(ConnectionState.failed == .failed)
+        #expect(ConnectionState.retrying(attempt: 1) == .retrying(attempt: 1))
+        #expect(ConnectionState.retrying(attempt: 1) != .retrying(attempt: 2))
+        #expect(ConnectionState.connected != .failed)
+    }
+}
+
 // MARK: - SpotifyController Waypoint Management Tests
 
 @Suite("SpotifyController Waypoints")
