@@ -39,7 +39,8 @@ struct ContentView: View {
                         VStack {
                             if let trackName = spotifyController.currentTrackName,
                                let trackArtist = spotifyController.currentTrackArtist,
-                               let trackImage = spotifyController.currentTrackImage {
+                               let trackImageData = spotifyController.currentTrackImage,
+                               let trackImage = UIImage(data: trackImageData) {
                                 // Album Art - Slightly smaller to fit everything
                                 Image(uiImage: trackImage)
                                     .resizable()
@@ -173,7 +174,8 @@ struct AccountMenu: View {
             }
         } label: {
             ZStack {
-                if let userImage = spotifyController.currentUserImage {
+                if let userImageData = spotifyController.currentUserImage,
+                   let userImage = UIImage(data: userImageData) {
                     Image(uiImage: userImage)
                         .resizable()
                         .scaledToFill()
@@ -290,7 +292,8 @@ struct BackgroundLayer: View {
             case .dark:
                 Color.black.ignoresSafeArea()
             case .album:
-                if let trackImage = spotifyController.currentTrackImage {
+                if let trackImageData = spotifyController.currentTrackImage,
+                   let trackImage = UIImage(data: trackImageData) {
                     Image(uiImage: trackImage)
                         .resizable()
                         .scaledToFill()

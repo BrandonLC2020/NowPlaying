@@ -17,6 +17,8 @@
 		71A64ADD2F09FE37000C384A /* AuthorizationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 71A64ADC2F09FE37000C384A /* AuthorizationView.swift */; };
 		71D4C63E2F5465A7008D372F /* PlaybackState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 71D4C63D2F5465A7008D372F /* PlaybackState.swift */; };
 		71D4C6402F5465AD008D372F /* PlaybackControlIntents.swift in Sources */ = {isa = PBXBuildFile; fileRef = 71D4C63F2F5465AD008D372F /* PlaybackControlIntents.swift */; };
+		71D4C6502F5470CC008D372F /* PlaybackState.swift in Sources (Widget) */ = {isa = PBXBuildFile; fileRef = 71D4C63D2F5465A7008D372F /* PlaybackState.swift */; };
+		71D4C6512F5470CC008D372F /* PlaybackControlIntents.swift in Sources (Widget) */ = {isa = PBXBuildFile; fileRef = 71D4C63F2F5465AD008D372F /* PlaybackControlIntents.swift */; };
 		71D4C6542F54C171008D372F /* Waypoint.swift in Sources */ = {isa = PBXBuildFile; fileRef = 71D4C6532F54C171008D372F /* Waypoint.swift */; };
 		CA265FF72C495B4900C1B3DB /* SpotifyiOS in Frameworks */ = {isa = PBXBuildFile; productRef = CA265FF62C495B4900C1B3DB /* SpotifyiOS */; };
 		CA265FFF2C4AD73500C1B3DB /* SpotifyController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CA265FFE2C4AD73500C1B3DB /* SpotifyController.swift */; };
@@ -566,6 +568,8 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				71D4C6502F5470CC008D372F /* PlaybackState.swift in Sources (Widget) */,
+				71D4C6512F5470CC008D372F /* PlaybackControlIntents.swift in Sources (Widget) */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -17,6 +17,7 @@ struct PlaybackState: Codable {
     var position: Int
     var lastUpdated: Date
 
+    /// Canonical "not connected" sentinel used throughout the app and widget as a safe fallback.
     static let empty = PlaybackState(
         trackName: "Not Playing",
         artistName: "Unknown Artist",
@@ -28,7 +29,9 @@ struct PlaybackState: Codable {
     )
 }
 
+/// Singleton that persists playback state and album art to the shared App Group container so the widget extension can read them.
 class PlaybackStateManager {
+    /// Shared instance used by both the app and widget targets.
     static let shared = PlaybackStateManager()
 
     // In a real app, you'd use an App Group ID here
@@ -39,6 +42,7 @@ class PlaybackStateManager {
         UserDefaults(suiteName: suiteName)
     }
 
+    /// Persists `state` to both the App Group shared defaults and `UserDefaults.standard`.
     func save(_ state: PlaybackState) {
         if let encoded = try? JSONEncoder().encode(state) {
             sharedDefaults?.set(encoded, forKey: storageKey)
@@ -47,6 +51,7 @@ class PlaybackStateManager {
         }
     }
 
+    /// Loads the most recently saved state, preferring the App Group store. Returns `.empty` if nothing has been saved.
     func load() -> PlaybackState {
         let data = sharedDefaults?.data(forKey: storageKey) ?? UserDefaults.standard.data(forKey: storageKey)
         if let data = data, let decoded = try? JSONDecoder().decode(PlaybackState.self, from: data) {
@@ -55,6 +60,7 @@ class PlaybackStateManager {
         return .empty
     }
 
+    /// Removes persisted state from both stores and deletes the album art file from the App Group container and caches directory.
     func clear() {
         sharedDefaults?.removeObject(forKey: storageKey)
         UserDefaults.standard.removeObject(forKey: storageKey)
@@ -69,8 +75,9 @@ class PlaybackStateManager {
         if let fallbackURL = fallbackURL { try? FileManager.default.removeItem(at: fallbackURL) }
     }
 
-    func saveImage(_ image: UIImage?) {
-        guard let image = image, let data = image.jpegData(compressionQuality: 0.8) else { return }
+    /// Writes JPEG image data to the App Group shared container (falls back to the caches directory).
+    func saveImage(_ imageData: Data?) {
+        guard let data = imageData else { return }
         let url = FileManager.default.containerURL(forSecurityApplicationGroupIdentifier: suiteName)?
             .appendingPathComponent("currentTrackImage.jpg")
 
@@ -81,6 +88,7 @@ class PlaybackStateManager {
         try? data.write(to: url ?? fallbackURL!)
     }
 
+    /// Reads the album art from the App Group container (or caches fallback). Returns `nil` if no image has been saved.
     func loadImage() -> UIImage? {
         let url = FileManager.default.containerURL(forSecurityApplicationGroupIdentifier: suiteName)?
             .appendingPathComponent("currentTrackImage.jpg")

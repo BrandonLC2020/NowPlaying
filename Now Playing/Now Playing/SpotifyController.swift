@@ -20,21 +20,35 @@ final class SpotifyController: NSObject, ObservableObject {
     )!
 
     var accessToken: String?
+
+    /// Spotify URI of the currently playing track (e.g. `spotify:track:abc123`).
     @Published var currentTrackURI: String?
+    /// Display name of the current track.
     @Published var currentTrackName: String?
+    /// Display name of the current track's primary artist.
     @Published var currentTrackArtist: String?
+    /// Duration of the current track in seconds.
     @Published var currentTrackDuration: Int?
-    @Published var currentTrackImage: UIImage?
+    /// JPEG data of the 300×300 album art for the current track.
+    @Published var currentTrackImage: Data?
+    /// Display name fetched from the Spotify `/v1/me` user profile endpoint.
     @Published var currentUserDisplayName: String?
-    @Published var currentUserImage: UIImage?
+    /// Profile photo data fetched from the Spotify user profile.
+    @Published var currentUserImage: Data?
+    /// Whether Spotify playback is currently paused. Changes persist state to the shared App Group.
     @Published var isPaused: Bool = true {
         didSet { saveState() }
     }
 
+    /// Current playback position in seconds, updated by a 1-second timer while playing.
     @Published var currentTrackPosition: Int = 0
+    /// Number of seconds to skip forward or backward via `skipForward()` / `skipBackward()`.
     @Published var skipInterval: Int = 15
+    /// Color-coded bookmarks for the current track, sorted ascending by position. Persisted per track URI.
     @Published var waypoints: [Waypoint] = []
+    /// Whether Spotify shuffle is active.
     @Published var isShuffling: Bool = false
+    /// Current repeat mode: `0` = off, `1` = track, `2` = context.
     @Published var repeatMode: UInt = 0
     private var timer: Timer?
 
@@ -49,6 +63,7 @@ final class SpotifyController: NSObject, ObservableObject {
         UIImpactFeedbackGenerator(style: style).impactOccurred()
     }
 
+    /// Adds a waypoint at the current playback position. Silently ignores duplicates at the same second.
     func addWaypoint() {
         let position = currentTrackPosition
         // Prevent duplicate waypoints at same second
@@ -63,6 +78,7 @@ final class SpotifyController: NSObject, ObservableObject {
         saveWaypoints()
     }
 
+    /// Seeks to `seconds` in the current track. Updates `currentTrackPosition` immediately before the SDK call resolves.
     func seek(to seconds: Int) {
         self.currentTrackPosition = seconds
         appRemote.playerAPI?.seek(toPosition: seconds * 1000, callback: { (_, error) in
@@ -72,17 +88,20 @@ final class SpotifyController: NSObject, ObservableObject {
         })
     }
 
+    /// Seeks to the position of `waypoint` and fires a medium haptic.
     func seekToWaypoint(_ waypoint: Waypoint) {
         haptic(.medium)
         seek(to: waypoint.position)
     }
 
+    /// Removes `waypoint` by ID and persists the updated list.
     func removeWaypoint(_ waypoint: Waypoint) {
         haptic(.heavy)
         waypoints.removeAll { $0.id == waypoint.id }
         saveWaypoints()
     }
 
+    /// Updates the label and color of an existing waypoint in-place, then persists.
     func updateWaypoint(_ waypoint: Waypoint, label: String?, colorHex: String) {
         guard let index = waypoints.firstIndex(where: { $0.id == waypoint.id }) else { return }
         waypoints[index] = Waypoint(id: waypoint.id, position: waypoint.position, colorHex: colorHex, label: label)
@@ -123,6 +142,7 @@ final class SpotifyController: NSObject, ObservableObject {
         WidgetCenter.shared.reloadAllTimelines()
     }
 
+    /// Extracts the OAuth access token from the Spotify callback URL and triggers user profile fetch.
     func setAccessToken(from url: URL) {
         let parameters = appRemote.authorizationParameters(from: url)
 
@@ -135,6 +155,7 @@ final class SpotifyController: NSObject, ObservableObject {
         }
     }
 
+    /// Opens the Spotify app to begin the OAuth authorization flow.
     func authorize() {
         self.appRemote.authorizeAndPlayURI("")
     }
@@ -154,18 +175,21 @@ final class SpotifyController: NSObject, ObservableObject {
         return appRemote
     }()
 
+    /// Connects to the Spotify app remote. Requires `accessToken` to be set on `connectionParameters`.
     func connect() {
         if self.appRemote.connectionParameters.accessToken != nil {
             appRemote.connect()
         }
     }
 
+    /// Disconnects from the Spotify app remote. No-ops if not currently connected.
     func disconnect() {
         if appRemote.isConnected {
             appRemote.disconnect()
         }
     }
 
+    /// Fully resets auth and playback state: disconnects, clears all published properties, stops the timer, and wipes the shared App Group.
     func logout() {
         disconnect()
         self.accessToken = nil
@@ -216,9 +240,9 @@ final class SpotifyController: NSObject, ObservableObject {
         guard let url = URL(string: urlString) else { return }
 
         URLSession.shared.dataTask(with: url) { data, _, error in
-            guard let data = data, error == nil, let image = UIImage(data: data) else { return }
+            guard let data = data, error == nil else { return }
             DispatchQueue.main.async {
-                self.currentUserImage = image
+                self.currentUserImage = data
             }
         }.resume()
     }
@@ -242,6 +266,7 @@ final class SpotifyController: NSObject, ObservableObject {
         }
     }
 
+    /// Fetches a 300×300 album art image for the current track via the Spotify image API and stores JPEG data in `currentTrackImage`.
     func fetchImage() {
         appRemote.playerAPI?.getPlayerState { (result, error) in
             if let error = error {
@@ -257,7 +282,7 @@ final class SpotifyController: NSObject, ObservableObject {
                             )
                         } else if let image = image as? UIImage {
                             DispatchQueue.main.async {
-                                self.currentTrackImage = image
+                                self.currentTrackImage = image.jpegData(compressionQuality: 1.0)
                             }
                         }
                     }
@@ -266,6 +291,7 @@ final class SpotifyController: NSObject, ObservableObject {
         }
     }
 
+    /// Skips to the previous track.
     func skipToPrevious() {
         haptic(.medium)
         appRemote.playerAPI?.skip(toPrevious: { [weak self] _, error in
@@ -277,6 +303,7 @@ final class SpotifyController: NSObject, ObservableObject {
         })
     }
 
+    /// Resumes Spotify playback.
     func play() {
         haptic(.heavy)
         appRemote.playerAPI?.resume({ [weak self] _, error in
@@ -286,6 +313,7 @@ final class SpotifyController: NSObject, ObservableObject {
         })
     }
 
+    /// Pauses Spotify playback.
     func pause() {
         haptic(.heavy)
         appRemote.playerAPI?.pause({ [weak self] _, error in
@@ -295,6 +323,7 @@ final class SpotifyController: NSObject, ObservableObject {
         })
     }
 
+    /// Skips to the next track.
     func skipToNext() {
         haptic(.medium)
         appRemote.playerAPI?.skip(toNext: { [weak self] _, error in
@@ -304,6 +333,7 @@ final class SpotifyController: NSObject, ObservableObject {
         })
     }
 
+    /// Seeks backward by `skipInterval` seconds, fetching the live position from the SDK first.
     func skipBackward() {
         haptic(.light)
         appRemote.playerAPI?.getPlayerState { [weak self] (result, error) in
@@ -334,6 +364,7 @@ final class SpotifyController: NSObject, ObservableObject {
         }
     }
 
+    /// Seeks forward by `skipInterval` seconds, fetching the live position from the SDK first.
     func skipForward() {
         haptic(.light)
         appRemote.playerAPI?.getPlayerState { [weak self] (result, error) in
@@ -364,6 +395,7 @@ final class SpotifyController: NSObject, ObservableObject {
         }
     }
 
+    /// Toggles Spotify shuffle on or off.
     func toggleShuffle() {
         haptic(.light)
         appRemote.playerAPI?.setShuffle(!isShuffling, callback: { _, error in
@@ -373,6 +405,7 @@ final class SpotifyController: NSObject, ObservableObject {
         })
     }
 
+    /// Cycles the repeat mode: off → track → context → off.
     func toggleRepeat() {
         haptic(.light)
         appRemote.playerAPI?.getPlayerState { (result, error) in

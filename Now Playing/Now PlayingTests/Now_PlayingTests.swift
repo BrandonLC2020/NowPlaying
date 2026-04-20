@@ -240,6 +240,96 @@ struct PlaybackStateManagerTests {
     }
 }
 
+// MARK: - SpotifyController Session & State Tests
+
+@Suite("SpotifyController Session & State")
+@MainActor
+struct SpotifyControllerSessionTests {
+
+    private func makeController() -> SpotifyController {
+        let controller = SpotifyController()
+        controller.currentTrackURI = "spotify:track:sessionTest"
+        controller.currentTrackName = "Test Track"
+        controller.currentTrackArtist = "Test Artist"
+        controller.currentTrackDuration = 240
+        controller.currentTrackPosition = 60
+        controller.currentTrackImage = Data([0xFF, 0xD8])
+        controller.currentUserDisplayName = "Test User"
+        controller.currentUserImage = Data([0x89, 0x50])
+        controller.isPaused = false
+        return controller
+    }
+
+    @Test("logout() clears all track and user state")
+    func logoutClearsState() {
+        let controller = makeController()
+        controller.logout()
+        #expect(controller.currentTrackName == nil)
+        #expect(controller.currentTrackArtist == nil)
+        #expect(controller.currentTrackImage == nil)
+        #expect(controller.currentTrackURI == nil)
+        #expect(controller.currentUserDisplayName == nil)
+        #expect(controller.currentUserImage == nil)
+        #expect(controller.waypoints.isEmpty)
+    }
+
+    @Test("logout() stops the position timer")
+    func logoutStopsTimer() {
+        let controller = makeController()
+        let positionBefore = controller.currentTrackPosition
+        controller.logout()
+        #expect(controller.currentTrackPosition == positionBefore)
+    }
+
+    @Test("seek(to:) updates currentTrackPosition immediately")
+    func seekUpdatesPosition() {
+        let controller = makeController()
+        controller.seek(to: 120)
+        #expect(controller.currentTrackPosition == 120)
+    }
+
+    @Test("seek(to:) reflects the target position regardless of prior position")
+    func seekOverwritesPriorPosition() {
+        let controller = makeController()
+        controller.currentTrackPosition = 180
+        controller.seek(to: 45)
+        #expect(controller.currentTrackPosition == 45)
+    }
+
+    @Test("updateWaypoint changes label and color in-place")
+    func updateWaypointMutatesInPlace() {
+        let controller = makeController()
+        controller.currentTrackPosition = 30
+        controller.addWaypoint()
+        let original = controller.waypoints[0]
+
+        controller.updateWaypoint(original, label: "Chorus", colorHex: "#4D96FF")
+
+        #expect(controller.waypoints.count == 1)
+        let updated = controller.waypoints[0]
+        #expect(updated.id == original.id)
+        #expect(updated.label == "Chorus")
+        #expect(updated.colorHex == "#4D96FF")
+        #expect(updated.position == original.position)
+
+        UserDefaults.standard.removeObject(forKey: "waypoints_spotify:track:sessionTest")
+    }
+
+    @Test("updateWaypoint with nil label clears the label")
+    func updateWaypointClearsLabel() {
+        let controller = makeController()
+        controller.currentTrackPosition = 60
+        controller.addWaypoint()
+        let original = controller.waypoints[0]
+
+        controller.updateWaypoint(original, label: "Intro", colorHex: original.colorHex)
+        controller.updateWaypoint(controller.waypoints[0], label: nil, colorHex: original.colorHex)
+
+        #expect(controller.waypoints[0].label == nil)
+        UserDefaults.standard.removeObject(forKey: "waypoints_spotify:track:sessionTest")
+    }
+}
+
 // MARK: - SpotifyController Waypoint Management Tests
 
 @Suite("SpotifyController Waypoints")
