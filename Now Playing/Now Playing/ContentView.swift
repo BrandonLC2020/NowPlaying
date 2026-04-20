@@ -150,11 +150,20 @@ struct ContentView: View {
 
 struct AccountMenu: View {
     @EnvironmentObject var spotifyController: SpotifyController
+    @State private var isSyncing = false
 
     var body: some View {
         Menu {
             Section {
                 Text("Account: \(spotifyController.currentUserDisplayName ?? "Loading...")")
+            }
+
+            Button(action: { resync() }) {
+                Label("Resync Connection", systemImage: "arrow.triangle.2.circlepath")
+            }
+
+            Button(action: { spotifyController.authorize() }) {
+                Label("Reconnect", systemImage: "arrow.clockwise.circle")
             }
 
             Button(role: .destructive, action: {
@@ -163,17 +172,39 @@ struct AccountMenu: View {
                 Label("Logout", systemImage: "rectangle.portrait.and.arrow.right")
             }
         } label: {
-            if let userImage = spotifyController.currentUserImage {
-                Image(uiImage: userImage)
-                    .resizable()
-                    .scaledToFill()
-                    .frame(width: 30, height: 30)
-                    .clipShape(Circle())
-            } else {
-                Image(systemName: "person.circle")
-                    .font(.title3)
-                    .foregroundColor(.primary)
+            ZStack {
+                if let userImage = spotifyController.currentUserImage {
+                    Image(uiImage: userImage)
+                        .resizable()
+                        .scaledToFill()
+                        .frame(width: 30, height: 30)
+                        .clipShape(Circle())
+                        .opacity(isSyncing ? 0.4 : 1.0)
+                        .animation(.easeInOut(duration: 0.2), value: isSyncing)
+                } else {
+                    Image(systemName: "person.circle")
+                        .font(.title3)
+                        .foregroundColor(.primary)
+                        .opacity(isSyncing ? 0.4 : 1.0)
+                        .animation(.easeInOut(duration: 0.2), value: isSyncing)
+                }
+
+                if isSyncing {
+                    ProgressView()
+                        .progressViewStyle(.circular)
+                        .tint(.primary)
+                        .scaleEffect(0.7)
+                        .transition(.opacity)
+                }
             }
+        }
+    }
+
+    private func resync() {
+        isSyncing = true
+        spotifyController.connect()
+        DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
+            isSyncing = false
         }
     }
 }
