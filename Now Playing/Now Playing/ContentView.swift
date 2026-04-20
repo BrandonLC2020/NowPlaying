@@ -47,6 +47,7 @@ struct ContentView: View {
                                     .frame(width: 200, height: 200)
                                     .cornerRadius(20)
                                     .shadow(color: .black.opacity(0.3), radius: 10, x: 0, y: 5)
+                                    .trackTransition(id: spotifyController.currentTrackURI, duration: 0.4)
 
                                 // Track Name
                                 Text(trackName)
@@ -57,6 +58,7 @@ struct ContentView: View {
                                     .foregroundColor(.white)
                                     .frame(width: 250)
                                     .shadow(radius: 2)
+                                    .trackTransition(id: spotifyController.currentTrackURI)
 
                                 // Artist Name
                                 Text(trackArtist)
@@ -66,6 +68,7 @@ struct ContentView: View {
                                     .foregroundColor(.white.opacity(0.9))
                                     .frame(width: 250)
                                     .shadow(radius: 2)
+                                    .trackTransition(id: spotifyController.currentTrackURI)
 
                                 // Main Controls
                                 MainControls()
@@ -109,9 +112,11 @@ struct ContentView: View {
                         // Waypoint Dock
                         if !spotifyController.waypoints.isEmpty {
                             WaypointDock()
+                                .transition(.slideUpFade)
                         }
                     }
                     .padding(20)
+                    .animation(.spring(response: 0.45, dampingFraction: 0.78), value: spotifyController.waypoints.isEmpty)
 
                     Spacer()
                 }
@@ -262,6 +267,7 @@ struct BackgroundLayer: View {
                         .ignoresSafeArea()
                         .blur(radius: CGFloat(blurRadius))
                         .overlay(Color.black.opacity(0.3))
+                        .trackTransition(id: spotifyController.currentTrackURI, duration: 0.6)
                 } else {
                     Color.black.ignoresSafeArea()
                 }
@@ -287,18 +293,14 @@ struct MainControls: View {
                     .foregroundColor(.white)
             }
 
-            if spotifyController.isPaused {
-                Button(action: { spotifyController.play() }) {
-                    Image(systemName: "play.fill")
-                        .font(.system(size: 40))
-                        .foregroundColor(.white)
-                }
-            } else {
-                Button(action: { spotifyController.pause() }) {
-                    Image(systemName: "pause.fill")
-                        .font(.system(size: 40))
-                        .foregroundColor(.white)
-                }
+            Button(action: {
+                spotifyController.isPaused ? spotifyController.play() : spotifyController.pause()
+            }) {
+                Image(systemName: spotifyController.isPaused ? "play.fill" : "pause.fill")
+                    .font(.system(size: 40))
+                    .foregroundColor(.white)
+                    .contentTransition(.symbolEffect(.replace))
+                    .animation(.easeInOut(duration: 0.2), value: spotifyController.isPaused)
             }
 
             Button(action: { spotifyController.skipToNext() }) {
@@ -347,7 +349,9 @@ struct ProgressBarLayer: View {
                 }
                 .onChange(of: spotifyController.currentTrackPosition) { newValue in
                     if scrubbingPosition == nil {
-                        localSliderValue = Double(newValue)
+                        withAnimation(.linear(duration: 1)) {
+                            localSliderValue = Double(newValue)
+                        }
                     }
                 }
                 .onAppear {
@@ -439,10 +443,12 @@ struct WaypointDock: View {
                                 Label("Delete", systemImage: "trash")
                             }
                         }
+                        .transition(.chipAppear)
                     }
                 }
                 .padding(.horizontal, 12)
                 .frame(minWidth: 250)
+                .animation(.spring(response: 0.35, dampingFraction: 0.7), value: spotifyController.waypoints)
             }
             .frame(height: 60)
         }
@@ -535,6 +541,13 @@ extension View {
     func glassBackground() -> some View {
         self.modifier(GlassBackground())
     }
+
+    func trackTransition(id: String?, duration: Double = 0.3) -> some View {
+        self
+            .id(id)
+            .transition(.opacity)
+            .animation(.easeInOut(duration: duration), value: id)
+    }
 }
 
 struct GlassBackground: ViewModifier {
@@ -568,6 +581,16 @@ struct GlassBackground: ViewModifier {
                     .blendMode(.overlay)
             )
             .shadow(color: .black.opacity(0.2), radius: 20, x: 0, y: 10)
+    }
+}
+
+extension AnyTransition {
+    static var slideUpFade: AnyTransition {
+        .move(edge: .bottom).combined(with: .opacity)
+    }
+
+    static var chipAppear: AnyTransition {
+        .scale(scale: 0.75).combined(with: .opacity)
     }
 }
 
