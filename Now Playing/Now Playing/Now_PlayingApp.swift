@@ -9,7 +9,11 @@ import SwiftUI
 
 @main
 struct NowPlayingApp: App {
-    @StateObject var spotifyController = SpotifyController()
+    @StateObject var spotifyController = SpotifyController.shared
+
+    init() {
+        PlaybackControlProvider.shared = SpotifyController.shared
+    }
 
     var body: some Scene {
         WindowGroup {

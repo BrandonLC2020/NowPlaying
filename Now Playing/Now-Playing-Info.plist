@@ -19,5 +19,9 @@
 	</array>
 	<key>SPOTIFY_API_CLIENT_ID</key>
 	<string>$(SPOTIFY_API_CLIENT_ID)</string>
+	<key>UIBackgroundModes</key>
+	<array>
+		<string>audio</string>
+	</array>
 </dict>
 </plist>

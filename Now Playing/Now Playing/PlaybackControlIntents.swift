@@ -8,14 +8,25 @@
 import AppIntents
 import WidgetKit
 
-struct PlayPauseIntent: AppIntent {
+struct PlayPauseIntent: AudioPlaybackIntent {
     static var title: LocalizedStringResource = "Play/Pause"
     static var description = IntentDescription("Toggles playback.")
 
     func perform() async throws -> some IntentResult {
-        // Here we'd ideally trigger the SpotifyController
-        // But SpotifyRemote requires a session.
-        // For now, let's just update the state and widget
+        if let controller = await PlaybackControlProvider.shared {
+            let connected = await controller.connectIfNeeded()
+            if connected {
+                await MainActor.run {
+                    if controller.isPaused {
+                        controller.play()
+                    } else {
+                        controller.pause()
+                    }
+                }
+            }
+        }
+        
+        // Update shared state for immediate UI feedback in the widget
         let state = PlaybackStateManager.shared.load()
         var newState = state
         newState.isPaused.toggle()
@@ -27,12 +38,20 @@ struct PlayPauseIntent: AppIntent {
     }
 }
 
-struct SkipNextIntent: AppIntent {
+struct SkipNextIntent: AudioPlaybackIntent {
     static var title: LocalizedStringResource = "Skip Next"
     static var description = IntentDescription("Skips to the next track.")
 
     func perform() async throws -> some IntentResult {
-        // Increment track position or something to simulate
+        if let controller = await PlaybackControlProvider.shared {
+            let connected = await controller.connectIfNeeded()
+            if connected {
+                await MainActor.run {
+                    controller.skipToNext()
+                }
+            }
+        }
+
         var state = PlaybackStateManager.shared.load()
         state.lastUpdated = Date()
         PlaybackStateManager.shared.save(state)
@@ -42,11 +61,20 @@ struct SkipNextIntent: AppIntent {
     }
 }
 
-struct SkipPreviousIntent: AppIntent {
+struct SkipPreviousIntent: AudioPlaybackIntent {
     static var title: LocalizedStringResource = "Skip Previous"
     static var description = IntentDescription("Skips to the previous track.")
 
     func perform() async throws -> some IntentResult {
+        if let controller = await PlaybackControlProvider.shared {
+            let connected = await controller.connectIfNeeded()
+            if connected {
+                await MainActor.run {
+                    controller.skipToPrevious()
+                }
+            }
+        }
+
         var state = PlaybackStateManager.shared.load()
         state.lastUpdated = Date()
         PlaybackStateManager.shared.save(state)

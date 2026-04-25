@@ -8,6 +8,20 @@
 import Foundation
 import SwiftUI
 
+@MainActor
+protocol PlaybackControlling {
+    func play()
+    func pause()
+    func skipToNext()
+    func skipToPrevious()
+    var isPaused: Bool { get }
+    func connectIfNeeded() async -> Bool
+}
+
+class PlaybackControlProvider {
+    static var shared: PlaybackControlling?
+}
+
 struct PlaybackState: Codable {
     var trackName: String
     var artistName: String

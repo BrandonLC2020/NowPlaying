@@ -111,7 +111,7 @@ struct ContentView: View {
                         .environment(\.colorScheme, .dark)
 
                         // Disconnected banner
-                        if spotifyController.connectionState != .connected {
+                        if spotifyController.showDisconnectBanner {
                             DisconnectedBanner()
                                 .transition(.slideUpFade)
                         }
@@ -124,7 +124,7 @@ struct ContentView: View {
                     }
                     .padding(20)
                     .animation(.spring(response: 0.45, dampingFraction: 0.78), value: spotifyController.waypoints.isEmpty)
-                    .animation(.easeInOut(duration: 0.3), value: spotifyController.connectionState == .connected)
+                    .animation(.easeInOut(duration: 0.3), value: !spotifyController.showDisconnectBanner)
 
                     Spacer()
                 }
@@ -359,6 +359,77 @@ struct MainControls: View {
     }
 }
 
+struct CompactSlider: View {
+    @Binding var value: Double
+    let range: ClosedRange<Double>
+    let onEditingChanged: (Bool) -> Void
+    
+    var body: some View {
+        GeometryReader { geometry in
+            let width = geometry.size.width
+            let height = geometry.size.height
+            let thumbRadius: CGFloat = 6
+            let trackHeight: CGFloat = 4
+            
+            let percentage = CGFloat((value - range.lowerBound) / (range.upperBound - range.lowerBound))
+            let usableWidth = width - (thumbRadius * 2)
+            let xPos = thumbRadius + (usableWidth * percentage)
+            
+            ZStack(alignment: .leading) {
+                // Background Track
+                RoundedRectangle(cornerRadius: trackHeight / 2)
+                    .fill(Color.white.opacity(0.2))
+                    .frame(height: trackHeight)
+                
+                // Active Track
+                RoundedRectangle(cornerRadius: trackHeight / 2)
+                    .fill(Color.white)
+                    .frame(width: xPos, height: trackHeight)
+                
+                // Thumb
+                Circle()
+                    .fill(Color.white)
+                    .frame(width: thumbRadius * 2, height: thumbRadius * 2)
+                    .shadow(color: .black.opacity(0.3), radius: 2, x: 0, y: 1)
+                    .position(x: xPos, y: height / 2)
+            }
+            .contentShape(Rectangle())
+            .gesture(
+                DragGesture(minimumDistance: 0)
+                    .onChanged { gesture in
+                        onEditingChanged(true)
+                        let newX = max(thumbRadius, min(gesture.location.x, width - thumbRadius))
+                        let newPercentage = Double((newX - thumbRadius) / usableWidth)
+                        value = range.lowerBound + (newPercentage * (range.upperBound - range.lowerBound))
+                    }
+                    .onEnded { _ in
+                        onEditingChanged(false)
+                    }
+            )
+        }
+        .frame(height: 12)
+    }
+}
+
+struct WaypointPin: View {
+    let color: Color
+    
+    var body: some View {
+        VStack(spacing: -1) {
+            Circle()
+                .fill(color)
+                .frame(width: 8, height: 8)
+            
+            Image(systemName: "triangle.fill")
+                .resizable()
+                .frame(width: 5, height: 5)
+                .rotationEffect(.degrees(180))
+                .foregroundColor(color)
+        }
+        .shadow(color: .black.opacity(0.3), radius: 1, x: 0, y: 1)
+    }
+}
+
 struct ProgressBarLayer: View {
     @EnvironmentObject var spotifyController: SpotifyController
     @Binding var scrubbingPosition: Double?
@@ -368,21 +439,40 @@ struct ProgressBarLayer: View {
     var body: some View {
         VStack(spacing: 4) {
             ZStack(alignment: .leading) {
-                Slider(
-                    value: $localSliderValue,
-                    in: 0...Double(max(1, spotifyController.currentTrackDuration ?? 1))
-                ) { scrubbing in
-                    if scrubbing {
-                        scrubbingPosition = localSliderValue
-                    } else {
-                        if let newPos = scrubbingPosition {
-                            UIImpactFeedbackGenerator(style: .light).impactOccurred()
-                            spotifyController.seek(to: Int(newPos))
-                            scrubbingPosition = nil
-                        }
+                // Waypoint Markers
+                GeometryReader { geometry in
+                    ForEach(spotifyController.waypoints) { waypoint in
+                        let percentage = CGFloat(waypoint.position) /
+                            CGFloat(max(1, spotifyController.currentTrackDuration ?? 1))
+                        
+                        // New CompactSlider thumb radius is 6pt
+                        let thumbInset: CGFloat = 6
+                        let trackWidth = geometry.size.width - (thumbInset * 2)
+                        let xPos = thumbInset + (trackWidth * percentage)
+                        
+                        WaypointPin(color: waypoint.color)
+                            .position(x: xPos, y: geometry.size.height / 2 - 12)
                     }
                 }
-                .accentColor(.white)
+                .frame(height: 24)
+                .allowsHitTesting(false)
+                .zIndex(1)
+
+                CompactSlider(
+                    value: $localSliderValue,
+                    range: 0...Double(max(1, spotifyController.currentTrackDuration ?? 1)),
+                    onEditingChanged: { scrubbing in
+                        if scrubbing {
+                            scrubbingPosition = localSliderValue
+                        } else {
+                            if let newPos = scrubbingPosition {
+                                UIImpactFeedbackGenerator(style: .light).impactOccurred()
+                                spotifyController.seek(to: Int(newPos))
+                                scrubbingPosition = nil
+                            }
+                        }
+                    }
+                )
                 .onChange(of: localSliderValue) { newValue in
                     if scrubbingPosition != nil {
                         scrubbingPosition = newValue
@@ -398,20 +488,6 @@ struct ProgressBarLayer: View {
                 .onAppear {
                     localSliderValue = Double(spotifyController.currentTrackPosition)
                 }
-
-                // Waypoint Markers
-                GeometryReader { geometry in
-                    ForEach(spotifyController.waypoints) { waypoint in
-                        let percentage = CGFloat(waypoint.position) /
-                            CGFloat(max(1, spotifyController.currentTrackDuration ?? 1))
-                        Circle()
-                            .fill(waypoint.color)
-                            .frame(width: 6, height: 6)
-                            .offset(x: (geometry.size.width * percentage) - 3, y: 12)
-                    }
-                }
-                .frame(height: 12)
-                .allowsHitTesting(false)
             }
 
             HStack {
@@ -574,29 +650,45 @@ struct DisconnectedBanner: View {
     @EnvironmentObject var spotifyController: SpotifyController
 
     var body: some View {
-        HStack(spacing: 8) {
-            Image(systemName: "wifi.slash")
-                .font(.caption)
+        Group {
+            if spotifyController.isPaused {
+                // Friendly Paused/Resync UI - Subtle hint
+                Button(action: { spotifyController.reconnect() }) {
+                    HStack(spacing: 6) {
+                        Image(systemName: "arrow.triangle.2.circlepath")
+                        Text("Resync Connection")
+                    }
+                    .font(.caption2.weight(.medium))
+                    .foregroundColor(.white.opacity(0.5))
+                    .padding(.vertical, 4)
+                }
+            } else {
+                // Actual connection error UI (only when playing) - Chunky banner
+                HStack(spacing: 8) {
+                    Image(systemName: "wifi.slash")
+                        .font(.caption)
 
-            switch spotifyController.connectionState {
-            case .retrying(let attempt):
-                Text("Disconnected · Retrying in \(spotifyController.retryCountdown)s (\(attempt)/5)")
-                    .font(.caption)
-            case .failed:
-                Text("Failed to reconnect")
-                    .font(.caption)
-                Spacer()
-                Button("Retry") { spotifyController.reconnect() }
-                    .font(.caption.weight(.semibold))
-            case .connected:
-                EmptyView()
+                    switch spotifyController.connectionState {
+                    case .retrying(let attempt):
+                        Text("Disconnected · Retrying in \(spotifyController.retryCountdown)s (\(attempt)/5)")
+                            .font(.caption)
+                    case .failed:
+                        Text("Failed to reconnect")
+                            .font(.caption)
+                        Spacer()
+                        Button("Retry") { spotifyController.reconnect() }
+                            .font(.caption.weight(.semibold))
+                    case .connected:
+                        EmptyView()
+                    }
+                }
+                .foregroundColor(.white.opacity(0.9))
+                .padding(.horizontal, 14)
+                .padding(.vertical, 8)
+                .glassBackground()
+                .environment(\.colorScheme, .dark)
             }
         }
-        .foregroundColor(.white.opacity(0.9))
-        .padding(.horizontal, 14)
-        .padding(.vertical, 8)
-        .glassBackground()
-        .environment(\.colorScheme, .dark)
     }
 }
 
